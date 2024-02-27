@@ -5,4 +5,3 @@ Nom du groupe : La cité de la *f*eur.
 Membres : [Baptiste Toussaint](https://github.com/I3at57),
 
 ---
-
