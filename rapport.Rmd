@@ -1,0 +1,76 @@
+---
+title: "rapport"
+author: "Baptiste Toussaint"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Option d'affichage utile pour les chunk de code
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Fj4cXJY4)
+
+# Analyse : GitHub Public Repository Metadata
+
+> Projet de *Data visualization* de l'unité d'enseignement IF36 de l'[Université de Technologie de Troyes (UTT)](https://www.utt.fr/).
+
+Nom du groupe : La cité de la *f*eur.
+
+Membres : [Baptiste Toussaint](https://github.com/I3at57),
+
+Langue : Français
+
+---
+
+## Introduction
+
+L'introduction sera récupérée depuis le `README.md` après avoir passé l'étape de
+proposition.
+
+## Étape intermédiaire smanipulations : charger le dataset
+
+```{r}
+# Chagre les librairies utiles
+library(tidyverse)
+library()
+```
+
+Dans le dossier `.\data\githubStar1-10\` on dispose de 10 fichiers `.csv` qui possèdent 10000 éléments chacun soit 100000 éléments.
+
+Je propse un petit script pour fusionner ces fichiers en un seul fichier commun pour simplifier la manipulation :
+
+```{r}
+list_of_csv_file <- list.files("./data/githubStar1-10/", full.names = TRUE)
+df <- readr::read_csv(list_of_csv_file[1], show_col_types = FALSE)
+for (file in list_of_csv_file[-1]) {
+    df <- rbind(df, readr::read_csv(file, show_col_types = FALSE))
+}
+```
+
+Pour vérifier :
+```{r}
+# Pour vérifier :
+dim(df)
+dim(unique(df))
+```
+
+```{r}
+dim(df)[1] - dim(unique(df))[1]
+```
+
+On a priori 1044 doublons, je décide de les conserver à ce stade qui ne concerne que la proposition.
+
+```{r}
+# A n'exécuter qu'une fois !
+readr::write_csv(df, "./data/githubStar1-10/data_1_100000.csv")
+```
+
+On peut vérifier :
+```{r}
+df <- read_csv("./data/githubStar1-10/data_1_100000.csv", show_col_types = FALSE)
+head(df)
+dim(df)
+```
+
