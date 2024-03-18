@@ -8,7 +8,7 @@ Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c
 
 Nom du groupe : La cité de la *f*eur.
 
-Membres : [Baptiste Toussaint](https://github.com/I3at57),
+Membres : [Baptiste Toussaint](https://github.com/I3at57),[XU Shilun](https://github.com/yvlann),
 
 Langue : Français
 
@@ -85,6 +85,40 @@ Le fichier JSON étant extrêmement lourd (2.34GB environ) nous avons du
 légèrement le manipuler pour extraire les données
 
 **DECRIRE LES OPERATIONS EFFECTUES**
+
+Afin de résoudre le problème des fichiers json trop lourd, nous avons décidé d'exécuter le code python suivant dans le notebook de Kaggle pour exporter les données par sections:
+
+    import pandas as pd
+
+    # read json file
+    json_file_path = '/kaggle/input/github-repository-metadata-with-5-stars/repo_metadata.json'
+    df = pd.read_json(json_file_path)
+
+    # every chunk row
+    chunk_size = 10000
+
+    # calculate rows
+    total_rows = df.shape[0]
+
+    # calculate the number of files
+    num_files = (total_rows + chunk_size - 1) // chunk_size
+
+    # split and output files
+    for i in range(num_files):
+        start_idx = i * chunk_size
+        end_idx = min((i + 1) * chunk_size, total_rows)
+        
+        # get current data
+        chunk_df = df.iloc[start_idx:end_idx]
+        
+        # generate file path
+        output_file_path = f'/kaggle/working/data_{i + 1}.csv'
+        
+        # output data to csv
+        chunk_df.to_csv(output_file_path, index=False)
+
+        print(f'File {i + 1} written to {output_file_path}')
+
 
 Nous avons donc dix fichiers nommés `data_X.csv` numérotés de un à dix.
 Nous avons ensuite regroupé les données de ces dix fichiers dans un
