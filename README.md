@@ -86,7 +86,7 @@ légèrement le manipuler pour extraire les données
 
 **DECRIRE LES OPERATIONS EFFECTUES**
 
-Afin de résoudre le problème des fichiers json trop lourd, nous avons décidé d'exécuter le code python suivant dans le notebook de Kaggle pour exporter les données par sections:
+Afin de résoudre le problème des fichiers json trop lourd, nous avons décidé d'exécuter le code python suivant dans le notebook de Kaggle pour exporter les données par sections en format de CSV:
 
     import pandas as pd
 
