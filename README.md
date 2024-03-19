@@ -178,7 +178,7 @@ variables suivantes (description mise en ligne par Peter Elmer
 
 -   `description`, description du *repo*. [type : `string`] ;
 
--   `primaryLanguage`, nom du langage de programmation principalement dans le projet. [type : `string`]
+-   `primaryLanguage`, nom du langage de programmation principalement dans le projet. [type : `string`] ;
 
 -   `createdAt`, date de création du dépôt. La date est au format : 
     "AAAA-MM-JJTHH:MM:SSZ", par exemple : "2015-03-14T22:35:11Z". Attention
