@@ -42,7 +42,17 @@ Dans le dossier `.\data\githubStar1-10\` on dispose de 10 fichiers `.csv` qui po
 Je propse un petit script pour fusionner ces fichiers en un seul fichier commun pour simplifier la manipulation :
 
 ```{r}
-list_of_csv_file <- list.files("./data/githubStar1-10/", full.names = TRUE)
+# Notre dossier data contient 2 sous dossiers:
+#   - 1-10 qui contient les fichiers .csv de 1 à 10
+#   - 11-20 qui contient les fichiers .csv de 11 à 20
+# On fait tourner une routine pour fusionner les 20 fichiers dans un seul fichier de données.
+
+# Fichiers du dossier de 1 à 10
+list_of_csv_file1 <- list.files("./data/githubStar1-10/", full.names = TRUE)
+# Fichiers du dossier de 11 à 20
+list_of_csv_file2 <- list.files("./data/githubStar11-20/", full.names = TRUE)
+list_of_csv_file <- c(list_of_csv_file1,list_of_csv_file2)
+
 df <- readr::read_csv(list_of_csv_file[1], show_col_types = FALSE)
 for (file in list_of_csv_file[-1]) {
     df <- rbind(df, readr::read_csv(file, show_col_types = FALSE))
@@ -51,7 +61,6 @@ for (file in list_of_csv_file[-1]) {
 
 Pour vérifier :
 ```{r}
-# Pour vérifier :
 dim(df)
 dim(unique(df))
 ```
@@ -60,16 +69,16 @@ dim(unique(df))
 dim(df)[1] - dim(unique(df))[1]
 ```
 
-On a priori 1044 doublons, je décide de les conserver à ce stade qui ne concerne que la proposition.
+On a priori 5804 doublons, je décide de les conserver à ce stade qui ne concerne que la proposition.
 
 ```{r}
 # A n'exécuter qu'une fois !
-readr::write_csv(df, "./data/githubStar1-10/data_1_100000.csv")
+readr::write_csv(df, "./data/data_1_200000.csv")
 ```
 
 On peut vérifier :
 ```{r}
-df <- read_csv("./data/githubStar1-10/data_1_100000.csv", show_col_types = FALSE)
+df <- read_csv("./data/data_1_200000.csv", show_col_types = FALSE)
 head(df)
 dim(df)
 ```
