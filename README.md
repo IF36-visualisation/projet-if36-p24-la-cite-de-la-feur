@@ -1,6 +1,12 @@
 [![Review Assignment Due
 Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Fj4cXJY4)
 
+<style>
+    blue {
+        color: #032ac5;
+    }
+</style>
+
 # Analyse : GitHub Public Repository Metadata
 
 > Projet de *Data visualization* de l'unité d'enseignement IF36 de
@@ -8,17 +14,24 @@ Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c
 
 Nom du groupe : La cité de la *f*eur.
 
-Membres : [Baptiste Toussaint](https://github.com/I3at57),[XU Shilun](https://github.com/yvlann),
+Membres : [Baptiste Toussaint](https://github.com/I3at57),
+ [XU Shilun](https://github.com/yvlann),
 
 Langue : Français
 
-------------------------------------------------------------------------
+---------------------------------------------------------------------
 
-## Introduction
+## <blue>Introduction</blue>
 
-### Description des données.
+### <blue>1. Description des données.</blue>
 
-#### Présentation de GitHub
+#### <blue>1.1. Présentation de GitHub</blue>
+
+<center>
+<img src="./src/img/GitHub_Logo.png" alt="Logo de la mascote de GitHub" width="200" margin="20"/>
+<img src="./src/img/github-mark.png" alt="Logo de GitHub" width="100"/ margin="20">
+</center>
+> Logo de GitHub et de sa mascotte : Octocat
 
 [*GitHub*](https://github.com/) est un service web à destination des
 développeurs permettant d'héberger, partager, et versionner du code.
@@ -48,7 +61,9 @@ Le 8 novembre dernier, l'entreprise *GitHub* déclarait alors près de 420
 millions de projets présents sur la plateforme, dont 284 millions
 publics.
 
-#### Les métadonnées de l'API GitHub
+
+#### <blue>1.2. Les métadonnées de l'API GitHub</blue>
+
 
 GitHub met à disposition une
 [API](https://docs.github.com/en/rest/about-the-rest-api/about-the-rest-api?apiVersion=2022-11-28)
@@ -70,23 +85,21 @@ Le résultat de ce script est un fichier JSON hébergé sur la plateforme
 [Kaggle](https://www.kaggle.com/datasets/pelmers/github-repository-metadata-with-5-stars/data).
 
 Pour faciliter la manipulation des données, nous avons décidé de ne
-conserver que les 100000 premières entrées de ce fichier JSON pour le
-moment. Cela correspond aux 100000 repos possédant le plus *d'étoiles*
+conserver que les 200000 premières entrées de ce fichier JSON pour le
+moment. Cela correspond aux 200000 repos possédant le plus *d'étoiles*
 sur la plateforme (les repos les plus *likés* si l'on peut se permettre
 cette analogie).
 
-Nous pourrons sans problème ajouter des données durant notre analyse si
-nous en ressentons le besoin.
+Nous pourrons sans problème ajouter des données durant
+notre analyse si nous en ressentons le besoin.
 
 Nous n'excluons pas non plus de recourir à l'API de GitHub pour
 augmenter les données pour améliorer l'analyse.
 
-Le fichier JSON étant extrêmement lourd (2.34GB environ) nous avons du
-légèrement le manipuler pour extraire les données
-
-**DECRIRE LES OPERATIONS EFFECTUES**
-
-Afin de résoudre le problème des fichiers json trop lourd, nous avons décidé d'exécuter le code python suivant dans le notebook de Kaggle pour exporter les données par sections en format de CSV:
+Afin de résoudre le problème des fichiers json trop lourd,
+nous avons décidé d'exécuter le code python suivant dans un
+notebook de sur Kaggle
+pour exporter les données par sections en format de CSV:
 
     import pandas as pd
 
@@ -121,13 +134,16 @@ Afin de résoudre le problème des fichiers json trop lourd, nous avons décidé
 
 
 Nous avons donc dix fichiers nommés `data_X.csv` numérotés de un à dix.
+Les dix premiers fichiers sont rangés dans le dossier : `githubStar1-10`,
+les dix suivants sont rangés dans le dossier : `githubStar11-20`.
+
 Nous avons ensuite regroupé les données de ces dix fichiers dans un
-unique fichier nommé `data_1_100000.csv` pour en faciliter la
+unique fichier nommé `data_1_200000.csv` pour en faciliter la
 manipulation.
 
-Ces fichiers se trouvent dans dans le dossier `./data/githubStar1-10/`.
+Ces fichiers se trouvent dans dans le dossier `./data/`.
 
-#### Présentation des données
+#### <blue>1.3. Présentation des données</blue>
 
 Le jeu de données contient donc environ trois millions de dépôts
 publics, tous ayant plus cinq étoiles.
@@ -210,7 +226,7 @@ variables suivantes (description mise en ligne par Peter Elmer
 
 -   `parent`, indique le nom du dépôt parent si ce dépôt est un *fork*. [type : `string`].
 
-#### Pourquoi étudier ces données ?
+#### <blue>1.4. Pourquoi étudier ces données ?</blue>
 
 Nous sommes trois étudiants de l'UTT avec un parcours tourné vers l'informatique, les
 nouvelles technologies et la programmation.
@@ -218,9 +234,9 @@ nouvelles technologies et la programmation.
 GitHub est une plateforme que nous utilisons personnellement (en plus de l’utiliser pour ce projet) de manières différentes : les langages de programmation utilisées dans la branche ISI de l'UTT sont
 différents des langages utilisés en branche GI.
 
-***ON PEUT DETAILLER EN PRESENTANT NOS GITHUB RESPECTIFS ***
-
 L'avantage de ce jeu de données est de permettre de présenter les langages de programmations utilisés dans les projets les plus populaires de la plateforme et pourquoi pas de comparer nos résultats avec nos langages préférés.
 
-### Plan de l'analyse
+---------------------------------------------------------------------
+
+### <blue>2. Plan de l'analyse</blue>
 
