@@ -31,6 +31,7 @@ Langue : Français
 <img src="./src/img/GitHub_Logo.png" alt="Logo de la mascote de GitHub" width="200" margin="20"/>
 <img src="./src/img/github-mark.png" alt="Logo de GitHub" width="100"/ margin="20">
 </center>
+
 > Logo de GitHub et de sa mascotte : Octocat
 
 [*GitHub*](https://github.com/) est un service web à destination des
@@ -240,3 +241,14 @@ L'avantage de ce jeu de données est de permettre de présenter les langages de 
 
 ### <blue>2. Plan de l'analyse</blue>
 
+#### <blue>2.1 Quelles informations pensons nous obtenir à partir de ces données ?</blue>
+
+```
+Exemples de questions :
+- Quels sont les languages les plus populaires?
+- Comment sont distribué les "stars" sur GitHub ?
+- Existe-il une corrélation entre les languages et les étoiles ?
+- Les projets les plus "likés" sont-il les plus forké?
+```
+
+#### <blue>2.2 Comment Analyser ces données ?</blue>
