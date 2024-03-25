@@ -15,7 +15,7 @@ Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c
 Nom du groupe : La cité de la *f*eur.
 
 Membres : [Baptiste Toussaint](https://github.com/I3at57),
- [XU Shilun](https://github.com/yvlann),
+ [XU Shilun](https://github.com/yvlann), [Louis Duhal Berruer](https://github.com/louisduhalberruer)
 
 Langue : Français
 
