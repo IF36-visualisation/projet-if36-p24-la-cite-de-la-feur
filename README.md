@@ -12,7 +12,7 @@ Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c
 > Projet de *Data visualization* de l'unité d'enseignement IF36 de
 > l'[Université de Technologie de Troyes (UTT)](https://www.utt.fr/).
 
-Nom du groupe : La cité de la *f*eur.
+Nom du groupe : La cité de la <blue>*f*</blue>eur.
 
 Membres : [Baptiste Toussaint](https://github.com/I3at57),
  [XU Shilun](https://github.com/yvlann), [Louis Duhal Berruer](https://github.com/louisduhalberruer)
@@ -241,14 +241,85 @@ L'avantage de ce jeu de données est de permettre de présenter les langages de 
 
 ### <blue>2. Plan de l'analyse</blue>
 
-#### <blue>2.1 Quelles informations pensons nous obtenir à partir de ces données ?</blue>
+#### <blue>2.1 Objectif de l'analyse</blue>
 
-```
-Exemples de questions :
-- Quels sont les languages les plus populaires?
-- Comment sont distribué les "stars" sur GitHub ?
-- Existe-il une corrélation entre les languages et les étoiles ?
-- Les projets les plus "likés" sont-il les plus forké?
-```
+Nous possédons donc les entrées relatives aux 200000 dépôts les plus *likés* de GitHub (ceux ayant obtnu les plus d'étoiles : *stars* ).
 
-#### <blue>2.2 Comment Analyser ces données ?</blue>
+Dans un premier temps, nous nous demanderons comment se répartissent les *stars*
+de notre population.
+
+On peut s'attendre à ce qu'une petite partie de projet possèdent un nombre important
+d'étoile, et ce nombre décroit rapidement, comme une exponentielle décroissante.
+
+Si l'on s'en tient au principe de [Pareto](https://fr.wikipedia.org/wiki/Principe_de_Pareto) (principe du 80/20), on peut penser que
+20% des dépôts sur GitHub concentrent 80% du nombre total d'étoiles attribués par
+les utilisateurs. Cette hypothèse n'est pas déraisonnable, puisque que ce principe
+est applicable dans beaucoup de domaine.
+
+Bien que le principe de [Pareto](https://fr.wikipedia.org/wiki/Principe_de_Pareto)
+ne soit pas une règle parfaite, c'est en général une première approche naïve utile
+pour appréhender des phénomènes.
+
+Si l'on considère GitHub comme un réseaux social, et que l'on considère que les *stars*
+d'un projet mesurent sa "popularité", nous chercherons dans la suite de l'étude à
+trouver ce qui peut expliquer la popularité d'un projet sur *GitHub*.
+
+Nous allons donc lier la caractéristique du nombre d'étoile avec les autres paramètres
+de notre jeu de données.
+
+#### <blue>Mesure de la popularité</blue>
+
+Nous disposons de la date de création des dépôts (notre jeux de données
+contient des dépôts crés entre 2009 et 2023), nous pourrons chercher si il existe
+une corrélation entre la date de création et la popularité du projet.
+En effet on peut penser que les dépôts les plus anciens sont les dépôts les plus appréciées.
+
+Avec le nombre de *fork* (ou clonage en français) par dépôt nous pourront essayer de voir si les projets les plus aimés sont aussi les projets les plus repris par les utilisateurs.
+
+Quand un utilisateurs *fork* un dépôt, il en crée une copie personnel sur laquelle il est libre d'ajouter les modifications qu'il souhaite.
+
+Le nombre de clonage peut être un indicateur supplémentaire de popularité et on peut chercher à savoir si cet indicateur est corrélé au nombre d'étoile d'un projet.
+
+Le paramètre *watchers* est une donnée supplémentaire d'analyse de "popularité".
+Quand on utilisateur *watchs* (que l'on peut traduire par surveiller ou suivre, en français) un projet, il est avertit quand ce dernier subit une
+modification.
+
+La encore, on pourra chercher à vérifier l'existance d'une corrélation entre le nombre d'étoile, le nombre de clone, et le nombre de suivi des dépôts.
+
+#### <blue>Mesure des contributions</blue>
+
+GitHub est énormément utilisé par les projets collaboratifs pour permettre aux développeurs du monde entier de contribuer à des projets.
+
+Selon leurs politiques de gouvernance, les propriétaires de dépôts peuvent
+permettre à certains utilisateurs autorisés ou à n'importe quel contributeur
+de proposer des modifications (les *pullRequests*) ou signaler des bugs (les *issues*).
+
+On dispose donc de ces deux indicateurs qui permettent de quantifier l'interactivité d'un projet : plus ces deux valeurs sont grandes, plus on peut considérer le projet comme actif.
+
+Nous ne disposons cependant pas du nombre de contributeurs par dépôt. L'attribut : `assignableUserCount` semble uniquement représenter le nombre de contributeurs ayant des droits d'accès spécifiques.
+
+Nous pourrons par exemple utiliser l'API pour augmenter notre jeu de données et trouver pour chaque dépôt le nombre de contributeur réel.
+
+#### <blue>Étude des language de programmation utilisés</blue>
+
+Nous pourrons ensuite analyser les types de langage utilisés.
+
+Nous chercherons à faire une cartographie des langages les plus utilisés et nous pourrons peut-être lier cette analyse avec la popularité des dépôts : existe-t-il des langages plus populaires que les autres ?
+
+On peut supposer par exemple que peut de dépôts très populaire contiennent du *Pascal* ou de l'*Ada*...
+
+#### <blue>Prise en compte des topics</blue>
+
+Toute notre analyse jusqu'ici repose sur une hypothèse : les dépots GitHub ne contiennent que des projets de programmation ou de code.
+
+Cette hypothèse est fausse ! En effet, avec sa démocratisation, GitHub a connu une diversification des usage.
+
+Aujourd'hui en tant que véritable réseau social pour développeurs et geek en tout genres, certains utilise la platforme pour
+créer des portfolio en ligne, des pages vitrines pour un site ou un service, etc.
+
+Par exemple, le dépôt : [papers-we-love](https://github.com/papers-we-love/papers-we-love)
+est une immense compilation de papiers scientifiques relatifs à l'informatique.
+
+Il est donc très difficile de comparer ce genre de dépôt avec des projets informatiques.
+
+L'attribut `topics` du dataset peut nous aider à classifier les dépôts selon leurs objectifs et catégories identifiées : projets, vitrines, listes, cours, etc.
