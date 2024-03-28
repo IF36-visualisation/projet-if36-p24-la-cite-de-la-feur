@@ -1,6 +1,9 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Fj4cXJY4)
 
 ```{=html}
+<! -- Uniquement pour les couleurs de titre -->
+<! -- De préférence utiliser un logiciel pour lire du Markdown car le site GitHub affiche le block de HTML tel quel -->
+
 <style>
     blue {
         color: #032ac5;
@@ -11,7 +14,7 @@
 
 > Projet de *Data visualization* de l'unité d'enseignement IF36 de l'[Université de Technologie de Troyes (UTT)](https://www.utt.fr/).
 
-Nom du groupe : ***La cité de la <blue>f</blue>eur.***
+Nom du groupe : ***La cité de la*** <blue>f</blue>eur.
 
 Membres : [Baptiste Toussaint](https://github.com/I3at57), [XU Shilun](https://github.com/yvlann), [Louis Duhal Berruer](https://github.com/louisduhalberruer)
 
@@ -94,17 +97,18 @@ for i in range(num_files):
 
 Nous avons donc dix fichiers nommés `data_X.csv` numérotés de 1 à 10. Les dix premiers fichiers sont rangés dans le dossier : `githubStar1-10`, les dix suivants sont rangés dans le dossier : `githubStar11-20`.
 
-Nous avons ensuite regroupé les données de ces dix fichiers dans un unique fichier nommé `data_1_200000.csv` pour en faciliter la manipulation.
+Nous avons ensuite regroupé les données de ces vingts fichiers dans un unique fichier nommé `data_1_200000.csv` pour en faciliter la manipulation.
 
-Ces fichiers se trouvent dans le dossier `./data/`.
+Ces fichiers se trouvent dans le dossier `./data/` de ce dépôt.
 
 #### <blue>1.3. Présentation des données</blue>
 
-Le jeu de données contient donc environ trois millions de dépôts publics, tous ayant plus cinq étoiles.
+Le jeu de données contient donc environ trois millions de dépôts publics, tous ayant plus de cinq étoiles (nous reviendrons plus loin sur la signification de ces étoiles).
 
 Chaque objet du fichier JSON représente un dépôt décrit par les variables suivantes (description mise en ligne par Peter Elmer [ici](https://github.com/pelmers/github-repository-metadata)).
 
--   `owner`, propriétaire ou créateur du dépôt, identifié par son nom d'utilisateur sur la plateforme GitHub. [type : `string`] ;
+-   `owner`, propriétaire ou créateur du dépôt, identifié par son nom
+d'utilisateur sur la plateforme GitHub. [type : `string`] ;
 
 -   `name`, nom du dépôt. [type : `string`] ;
 
@@ -158,15 +162,19 @@ Chaque objet du fichier JSON représente un dépôt décrit par les variables su
 
 Nous sommes trois étudiants de l'UTT avec un parcours tourné vers l'informatique, les nouvelles technologies et la programmation.
 
-GitHub est une plateforme que nous utilisons personnellement (en plus de l’utiliser pour ce projet) de manières différentes : les langages de programmation utilisées dans la branche ISI de l'UTT sont différents des langages utilisés en branche GI.
+GitHub est une plateforme que nous utilisons personnellement (en plus de l’utiliser pour ce projet) de manières différentes : les langages de programmation utilisées dans la branche ISI de l'UTT sont différents des langages utilisés en branche GI par exemple.
 
-L'avantage de ce jeu de données est de permettre de présenter les langages de programmations utilisés dans les projets les plus populaires de la plateforme et pourquoi pas de comparer nos résultats avec nos langages préférés.
+L'avantage de ce jeu de données est de permettre de présenter les langages de programmations utilisés dans les projets
+les plus "populaires" de la plateforme et pourquoi pas de comparer nos résultats avec nos langages préférés.
+
+Ce travail d'analyse des tendance est déjà fait par GitHub chaque années à travers
+ces articles [Octoverse report](https://octoverse.github.com/).
 
 ------------------------------------------------------------------------
 
 ### <blue>2. Plan d'analyse</blue>
 
-#### <blue>2.1 Objectif de l'analyse</blue>
+#### <blue>2.1 Objectifs de l'analyses</blue>
 
 Nous possédons donc les entrées relatives aux 200000 dépôts les plus *likés* de GitHub (ceux ayant obtenu les plus d'étoiles : *stars* ).
 
@@ -229,3 +237,6 @@ Par exemple, le dépôt : [papers-we-love](https://github.com/papers-we-love/pap
 Il est donc très difficile de comparer ce genre de dépôt avec des projets informatiques.
 
 L'attribut `topics` du dataset peut nous aider à classifier les dépôts selon leurs objectifs et catégories identifiées : projets, vitrines, listes, cours, etc.
+
+Que ce soit pour les langages de programmation ou les *topics* utilisées, nous pourrons
+essayer de reproduire un résultat montré par l'utilisateur 
