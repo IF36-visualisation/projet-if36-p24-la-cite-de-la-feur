@@ -164,7 +164,7 @@ L'avantage de ce jeu de données est de permettre de présenter les langages de 
 
 ------------------------------------------------------------------------
 
-### <blue>2. Proposition d'analyse</blue>
+### <blue>2. Plan d'analyse</blue>
 
 #### <blue>2.1 Objectif de l'analyse</blue>
 
