@@ -238,5 +238,12 @@ Il est donc très difficile de comparer ce genre de dépôt avec des projets inf
 
 L'attribut `topics` du dataset peut nous aider à classifier les dépôts selon leurs objectifs et catégories identifiées : projets, vitrines, listes, cours, etc.
 
-Que ce soit pour les langages de programmation ou les *topics* utilisées, nous pourrons
-essayer de reproduire un résultat montré par l'utilisateur 
+Il sera possible d’effectuer une analyse croisée entre les langages et les *topics* pour observer
+quels *topics* sont associés à quels langages.
+
+Le créateur du dataset, Peter Elmer, propose sur la page kaggle une représentation
+de type *word clouds* montrant les *topics* les plus représentés par langage de
+programmation.
+
+Nous pourrons essayer de reproduire ce résultat, d'autant qu'il n'a pas partagé
+le code correspondant.
