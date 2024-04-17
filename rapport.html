@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Baptiste Toussaint" />
 
+<meta name="date" content="2024-04-17" />
 
-<title>README</title>
+<title>rapport</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -348,10 +350,24 @@ display: none;
 
 
 
+<h1 class="title toc-ignore">rapport</h1>
+<h4 class="author">Baptiste Toussaint</h4>
+<h4 class="date">2024-04-17</h4>
 
 </div>
 
 
+<!-- Zones de paramètres pour le rapport final -->
+<!-- -- Uniquement pour les couleurs de titre ---->
+<!-- -- De préférence utiliser un logiciel pour lire du Markdown car le site GitHub affiche le block de HTML tel quel ---->
+
+<style>
+blue {
+color: #032ac5;
+}
+</style>
+<!-- Début du rapport -->
+<!-- Include l'introduction -->
 <!-- -- Uniquement pour les couleurs de titre ---->
 <!-- -- De préférence utiliser un logiciel pour lire du Markdown car le site GitHub affiche le block de HTML tel quel ---->
 
@@ -704,6 +720,71 @@ les plus représentés par langage de programmation.</p>
 pas partagé le code correspondant.</p>
 </div>
 </div>
+</div>
+<div id="étape-intermédiaire-manipulations-charger-le-dataset" class="section level2">
+<h2>Étape intermédiaire manipulations : charger le dataset</h2>
+<pre class="r"><code># Chagre les librairies utiles
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+## ✔ purrr     1.0.2     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<p>Dans le dossier <code>.\data\githubStar1-10\</code> on dispose de 10
+fichiers <code>.csv</code> qui possèdent 10000 éléments chacun soit
+100000 éléments.</p>
+<p>Je propse un petit script pour fusionner ces fichiers en un seul
+fichier commun pour simplifier la manipulation :</p>
+<pre class="r"><code># Notre dossier data contient 2 sous dossiers:
+#   - 1-10 qui contient les fichiers .csv de 1 à 10
+#   - 11-20 qui contient les fichiers .csv de 11 à 20
+# On fait tourner une routine pour fusionner les 20 fichiers dans un seul fichier de données.
+
+# Fichiers du dossier de 1 à 10
+list_of_csv_file1 &lt;- list.files(&quot;./data/githubStar1-10/&quot;, full.names = TRUE)
+# Fichiers du dossier de 11 à 20
+list_of_csv_file2 &lt;- list.files(&quot;./data/githubStar11-20/&quot;, full.names = TRUE)
+list_of_csv_file &lt;- c(list_of_csv_file1,list_of_csv_file2)
+
+df &lt;- readr::read_csv(list_of_csv_file[1], show_col_types = FALSE)
+for (file in list_of_csv_file[-1]) {
+    df &lt;- rbind(df, readr::read_csv(file, show_col_types = FALSE))
+}</code></pre>
+<p>Pour vérifier :</p>
+<pre class="r"><code>dim(df)</code></pre>
+<pre><code>## [1] 200000     25</code></pre>
+<pre class="r"><code>dim(unique(df))</code></pre>
+<pre><code>## [1] 194196     25</code></pre>
+<pre class="r"><code>dim(df)[1] - dim(unique(df))[1]</code></pre>
+<pre><code>## [1] 5804</code></pre>
+<p>On a priori 5804 doublons, je décide de les conserver à ce stade qui
+ne concerne que la proposition.</p>
+<pre class="r"><code># A n&#39;exécuter qu&#39;une fois !
+readr::write_csv(df, &quot;./data/data_1_200000.csv&quot;)</code></pre>
+<p>On peut vérifier :</p>
+<pre class="r"><code>df &lt;- read_csv(&quot;./data/data_1_200000.csv&quot;, show_col_types = FALSE)
+head(df)</code></pre>
+<pre><code>## # A tibble: 6 × 25
+##   owner    name   stars forks watchers isFork isArchived languages languageCount
+##   &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;lgl&gt;  &lt;lgl&gt;      &lt;chr&gt;             &lt;dbl&gt;
+## 1 freeCod… free… 371122 33158     8446 FALSE  FALSE      [{&#39;name&#39;…             9
+## 2 EbookFo… free… 295895 56913     9733 FALSE  FALSE      []                    0
+## 3 996icu   996.… 267804 21532     4242 FALSE  TRUE       []                    0
+## 4 sindres… awes… 265809 26349     7549 FALSE  FALSE      []                    0
+## 5 jwasham  codi… 263430 69043     8604 FALSE  FALSE      []                    0
+## 6 public-… publ… 252370 28947     3897 FALSE  FALSE      [{&#39;name&#39;…             2
+## # ℹ 16 more variables: topics &lt;chr&gt;, topicCount &lt;dbl&gt;, diskUsageKb &lt;dbl&gt;,
+## #   pullRequests &lt;dbl&gt;, issues &lt;dbl&gt;, description &lt;chr&gt;, primaryLanguage &lt;chr&gt;,
+## #   createdAt &lt;dttm&gt;, pushedAt &lt;dttm&gt;, defaultBranchCommitCount &lt;dbl&gt;,
+## #   license &lt;chr&gt;, assignableUserCount &lt;dbl&gt;, codeOfConduct &lt;chr&gt;,
+## #   forkingAllowed &lt;lgl&gt;, nameWithOwner &lt;chr&gt;, parent &lt;lgl&gt;</code></pre>
+<pre class="r"><code>dim(df)</code></pre>
+<pre><code>## [1] 200000     25</code></pre>
 </div>
 </div>
 

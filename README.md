@@ -1,5 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Fj4cXJY4)
-
 ```{=html}
 <! -- Uniquement pour les couleurs de titre -->
 <! -- De préférence utiliser un logiciel pour lire du Markdown car le site GitHub affiche le block de HTML tel quel -->
@@ -10,6 +8,9 @@
     }
 </style>
 ```
+
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Fj4cXJY4)
+
 # Analyse : GitHub Public Repository Metadata
 
 > Projet de *Data visualization* de l'unité d'enseignement IF36 de l'[Université de Technologie de Troyes (UTT)](https://www.utt.fr/).

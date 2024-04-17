@@ -1,40 +1,45 @@
 ---
-title: "rapport"
+title: "Projet IF36"
 author: "Baptiste Toussaint"
 date: "`r Sys.Date()`"
 output: html_document
 ---
 
+<!-- Zones de paramètres pour le rapport final -->
+
 ```{r setup, include=FALSE}
 # Option d'affichage utile pour les chunk de code
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+    echo = TRUE, # Affiche les blocs de code
+    cache = TRUE # Permet de mettre les données de compilation en cache pour 
+    # Accélérer la compilation
+)
 ```
 
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Fj4cXJY4)
+```{=html}
+<! -- Uniquement pour les couleurs de titre -->
+<! -- De préférence utiliser un logiciel pour lire du Markdown car le site GitHub affiche le block de HTML tel quel -->
 
-# Analyse : GitHub Public Repository Metadata
+<style>
+    blue {
+        color: #032ac5;
+    }
+</style>
+```
 
-> Projet de *Data visualization* de l'unité d'enseignement IF36 de l'[Université de Technologie de Troyes (UTT)](https://www.utt.fr/).
+<!-- Début du rapport -->
 
-Nom du groupe : La cité de la *f*eur.
+<!-- Include l'introduction -->
 
-Membres : [Baptiste Toussaint](https://github.com/I3at57),
+```{r child = './README.md'}
 
-Langue : Français
+```
 
----
-
-## Introduction
-
-L'introduction sera récupérée depuis le `README.md` après avoir passé l'étape de
-proposition.
-
-## Étape intermédiaire smanipulations : charger le dataset
+## Étape intermédiaire manipulations : charger le dataset
 
 ```{r}
 # Chagre les librairies utiles
 library(tidyverse)
-library()
 ```
 
 Dans le dossier `.\data\githubStar1-10\` on dispose de 10 fichiers `.csv` qui possèdent 10000 éléments chacun soit 100000 éléments.
