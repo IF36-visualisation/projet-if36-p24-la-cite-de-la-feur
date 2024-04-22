@@ -55,7 +55,7 @@ Il est important de noter que le fichier JSON de Peter Elmers ne contient que de
 
 Le résultat de ce script est un fichier JSON hébergé sur la plateforme [Kaggle](https://www.kaggle.com/datasets/pelmers/github-repository-metadata-with-5-stars/data).
 
-La dernière mise à jour du jeu de donnée date du 25 février 2024. Les données sont donc actuelles et toujours pertienentes à analyser.
+La dernière mise à jour du jeu de donnée date du 25 février 2024. Les données sont donc actuelles et toujours pertinentes à analyser.
 
 De plus, le jeu de données est partagé sous license : "Attribution 4.0 International (CC BY 4.0)".
 

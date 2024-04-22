@@ -462,6 +462,10 @@ minimum 5 étoiles (l’équivalent des <em>like</em> sur la plateforme
 github).</p>
 <p>Le résultat de ce script est un fichier JSON hébergé sur la
 plateforme <a href="https://www.kaggle.com/datasets/pelmers/github-repository-metadata-with-5-stars/data">Kaggle</a>.</p>
+<p>La dernière mise à jour du jeu de donnée date du 25 février 2024. Les
+données sont donc actuelles et toujours pertinentes à analyser.</p>
+<p>De plus, le jeu de données est partagé sous license : “Attribution
+4.0 International (CC BY 4.0)”.</p>
 <p>Pour faciliter la manipulation des données, nous avons décidé de ne
 conserver que les 200000 premières entrées de ce fichier JSON pour le
 moment. Cela correspond aux 200000 repos possédant le plus
@@ -762,8 +766,8 @@ for (file in list_of_csv_file[-1]) {
 <pre><code>## [1] 194196     25</code></pre>
 <pre class="r"><code>dim(df)[1] - dim(unique(df))[1]</code></pre>
 <pre><code>## [1] 5804</code></pre>
-<p>On a priori 5804 doublons, je décide de les conserver à ce stade qui
-ne concerne que la proposition.</p>
+<p>On a priori 5804 doublons, je décide de les conserver à ce stade, il
+seront traités plus loin.</p>
 <pre class="r"><code># A n&#39;exécuter qu&#39;une fois !
 readr::write_csv(df, &quot;./data/data_1_200000.csv&quot;)</code></pre>
 <p>On peut vérifier :</p>
