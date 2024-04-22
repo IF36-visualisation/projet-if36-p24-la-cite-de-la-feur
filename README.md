@@ -55,6 +55,10 @@ Il est important de noter que le fichier JSON de Peter Elmers ne contient que de
 
 Le résultat de ce script est un fichier JSON hébergé sur la plateforme [Kaggle](https://www.kaggle.com/datasets/pelmers/github-repository-metadata-with-5-stars/data).
 
+La dernière mise à jour du jeu de donnée date du 25 février 2024. Les données sont donc actuelles et toujours pertienentes à analyser.
+
+De plus, le jeu de données est partagé sous license : "Attribution 4.0 International (CC BY 4.0)".
+
 Pour faciliter la manipulation des données, nous avons décidé de ne conserver que les 200000 premières entrées de ce fichier JSON pour le moment. Cela correspond aux 200000 repos possédant le plus *d'étoiles* sur la plateforme (les repos les plus *likés* si l'on peut se permettre cette analogie).
 
 Nous pourrons sans problème ajouter des données durant notre analyse si nous en ressentons le besoin.
