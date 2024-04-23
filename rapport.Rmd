@@ -14,6 +14,7 @@ knitr::opts_chunk$set(
     cache = TRUE # Permet de mettre les données de compilation en cache pour 
     # Accélérer la compilation
 )
+rm(list=ls())
 ```
 
 <!-- Début du rapport -->
@@ -275,7 +276,7 @@ Dans le dossier `.\data\githubStar1-10\` on dispose de 10 fichiers `.csv` qui po
 
 Je propse un petit script pour fusionner ces fichiers en un seul fichier commun pour simplifier la manipulation :
 
-```{r}
+```{r eval=FALSE}
 # A n'exécuter qu'une fois !
 
 # Notre dossier data contient 2 sous dossiers:
@@ -299,12 +300,259 @@ readr::write_csv(df, "./data/data_1_200000.csv")
 
 Pour vérifier :
 ```{r}
-dim(df)
-dim(unique(df)) #
+# Si besoin de charger le dataset
+df <- read_csv("./data/data_1_200000.csv")
+```
+
+### 2. Traitement des doublons
+
+Pour commencer nous devons nettoyer le dataset en identifiant les possibles doublons.
+
+```{r}
 dim(df)[1] - dim(unique(df))[1] # Nombre de doublons
 ```
 
-On a priori 5804 doublons, je décide de les conserver à ce stade, il seront traités plus loin.
+Nous avons à priori 5804 doublons.
 
-### 2.
+```{r}
+df_duplicates <- df[duplicated(df),] # stock les doublons dans un objet
+head(df_duplicates) # Montre les premières lignes des doublons
+df <- unique(df) # retire les doublons au dataset df
+n <- dim(df)[1]
+m <- dim(df)[2]
+```
 
+### 3.Plan de l'analyse
+
+### 4. Analyse du nombre d'étoiles : ***strars***
+
+#### 4.1 Notre interprétation du nombre d'étoile d'un dépôt sur GitHub
+
+Le fichier `data_1_200000.csv` contenu dans l'objet `df` contient les 200000 dépôts
+possédant le plus d'étoiles (***stars***) sur GitHub au 25 février 2024.
+
+Sur GitHub, les étoiles jouent un rôle similaire à celui des *likes* sur les
+réseaux-sociaux classiques. Ainsi, on peut partir du postulat que nous disposons
+d'informations relatives aux ***repo*** les plus "populaires" de GitHub.
+
+Cette les raisons qui peuvent pousser un utilisateur à *liker* un dépôt sont nombreuses :
+conserver le projet dans son historique personnel pour y revenir plus tard,
+signifier que l'on apprécie ce dépôt, etc.
+
+Nous considérerons ici le nombre d'étoile comme un indicateur de "popularité"
+sans s'attarder sur une définition formelle de la "popularité".
+
+#### 4.2 Comment se répartissent le nombre d'étoile sur la plateforme ?
+
+La première question que nous pouvons nous poser concerne la répartition du nombre
+d'étoiles sur GitHub. Si l'on considère le nombre d'étoile comme une variable
+quantitative aléatoire discrète, comment se répartissent les valeurs de cette
+variable ? On peut s'attendre à avoir un très petit nombre de projets ayant
+un grand nombre d'étoiles et la majorité des projets autour d'une dizaine.
+
+Pour rappel, notre jeu de données comporte un biais certain : le créateur à
+initialement regroupé les dépôts **publics** (donc visibles de tous, ce qui écarte
+la majorité des dépôts GitHub qui sont privés) ayant 5 étoiles ou plus. On peut
+supposer que l'écrasante majorité des dépôts du site ont moins de 5 étoiles (
+c'est par exemple le cas de l'ensemble des projets présents sur nos GitHub respectifs, étant des projets personnels ou académiques).
+
+Nous avons ensuite choisit de ne conserver que les 200000 premiers dépôts, soit
+les dépôts ayant le plus d'étoiles.
+
+Nous travaillons donc sur les 200000 projets ayant le plus d'étoiles sur GitHub.
+
+Pour simplifier le travail, je propose de trier le dataset par en fonction du
+nombre d'étoile dans l'ordre décroisant
+
+```{r}
+df <- df %>% arrange(desc(stars))
+```
+
+
+Pour répondre à cette question, on peut utiliser un [`Density Plot`](https://datavizcatalogue.com/methods/density_plot.html) pour visualiser la
+distribution de cette variable.
+
+```{r}
+ggplot(data = df) +
+    geom_density(aes(x = stars)) +
+    labs(x = "Nombre d'étoiles ('stars')",
+         y = "Fréquence",
+         title = "Répartition du nombre d'étoiles des dépôts")
+```
+
+En tant que tel, ce premier graphique n'est pas interprétable. On comprend seulement que
+certains dépôts ont plus de 300000 étoiles (ont peut lire `3e+05` sur l'échelle des abscisses)
+là ou la majorité sont proches de `0e+00` et ont donc un nombre d'étoiles dans l'ordre de la centaine ou du millier.
+
+De plus, les fréquences indiquées sont difficilement manipulables par le cerveau
+humain : on préférera afficher le nombre de dépôt (nombre d'entrée dans le dataset) que la fréquence.
+
+On peut identifier les valeurs minimum et maximum d'étoiles de notre dataset :
+```{r}
+sprintf("Nombre maximum d'étoiles : %d", max(df$stars))
+sprintf("Nombre minimum d'étoiles : %d", min(df$stars))
+```
+
+Le projet ayant le moins d'étoile en possède 97 (la sélection décrite
+plus haut masque la très grande majorité des dépôts du jeu de donnée initial qui ont donc moins de 97 étoiles). Le projet ayant le plus d'étoile en possède 371122.
+
+Je propose à ce stade de retirer les dépôts ayant plus de 10000 étoiles :
+```{r}
+df[df$stars > 10000,] %>% nrow()
+```
+
+ce qui représente 3089 dépôts sur nos 194196.
+
+Je propose donc de séparer l'analyse en deux :
+- pour les projets ayant plus de 10000 étoiles ;
+- pour les projets ayant 10000 étoiles ou moins.
+
+Je propose aussi d'utiliser un histogramme : ce type de graphique est plus adapté dans notre cas car il permet de définir des "classes" pour ranger nos dépôts.
+
+```{r}
+# Histogramme avec les dépôts stars <= 10000
+ggplot(data = df[df$stars <= 10000,]) +
+    # Ajoute la géométrie histogramme
+    geom_histogram(aes(x = stars),
+                   # breaks sert à définir les séparations des barres
+                   breaks = seq(0,10000,100)) +
+    labs(x = "Nombre d'étoiles ('stars') par classes de 100",
+         y = "Nombre de dépôts",
+         title = "Répartition du nombre d'étoiles des dépôts
+         pour les dépôts avec 10000 étoiles ou moins")
+```
+
+On comprend avec ce second graphique que la majorité des dépôts ont moins de
+2500 étoiles et quelque uns en ont plus de 5000.
+
+On peut ensuite afficher uniquement les dépôts ayant plus de 10000 étoiles.
+
+```{r}
+ggplot(data = df[df$stars >= 10000,]) +
+    # Ajoute la géométrie histogramme
+    geom_histogram(aes(x = stars)) + 
+    labs(x = "Nombre d'étoiles ('stars') par classes de 100",
+         y = "Nombre de dépôts",
+         title = "Répartition du nombre d'étoiles des dépôts
+         pour les dépôts avec plus de 10000 étoiles")
+```
+Bien que l'échelle ne soit plus la même (on atteint $3\times 10^5$ pour notre dépôt à 371122 étoiles), on retrouve une distribution très similaire.
+
+Si l'on se restreint avec les 1000 dépôts avec le plus d'étoiles on a :
+
+```{r}
+# le dataset df est déjà trié par nombre d'étoiles décroissante
+ggplot(data = df[1:1000,]) +
+    # Ajoute la géométrie histogramme
+    geom_histogram(aes(x = stars)) + 
+    labs(x = "Nombre d'étoiles ('stars') par classes de 100",
+         y = "Nombre de dépôts",
+         title = "Répartition du nombre d'étoiles des dépôts
+         pour les dépôts avec plus de 10000 étoiles")
+```
+
+Il semble que l'on retrouve encore une distribution avec une forme similaire.
+
+On peut conclure que notre hypothèse de base était la bonne : la majorité des
+dépôts ont peu d'étoiles ("peu d'étoile" relativement à notre échantillon, soit entre 97 et 1000) et quelque uns arrivent à monter plus haut, voir pour certains atteindre des centaines de milliers.
+
+Pour appuyer cette remarque on peut regarder les 10 dépots ayant le plus d'étoiles.
+
+```{r}
+library("ggrepel")
+ggplot(arrange(df[1:10,],stars),
+       aes(x = 1:10, y = stars)) +
+    geom_point() +
+    geom_text_repel(aes(label = name)) +
+    # on ajoute une graduation pour ne pas couper le label du 10 élément
+    xlim(0,11) +
+    labs(title = "Nombre d'étoile des 10 projets en ayant le plus
+         sur GitHub",
+         x = " ",
+         y = "Nombre d'étoiles") +
+    # améliorer l'échelle affichée pour les ordonnés
+    scale_y_continuous(breaks = seq(200000,400000,10000)) +
+    # retire l'échelle en abscisse
+    theme(axis.text.x = element_blank(),
+          axis.ticks = element_blank())
+```
+
+On remarque immédiatement qu'il y a plus de 100000 étoiles de différence entre le dépôt `freeCodeCamp` qui en possède 371122 et le dépôt `react` qui en possède 211912.
+
+```{r}
+sprintf("Nombre d'étoiles de %s : %d", df[1,]$name, df[1,]$stars)
+sprintf("Nombre d'étoiles de %s : %d", df[10,]$name, df[10,]$stars)
+```
+
+L'augmentation du nombre d'étoile n'est absolument pas linéaire et grimper dans
+le classement de *popularité* est de plus en plus difficile à mesure que l'on
+progresse.
+
+Si l'on considère le nombre d'étoile comme une variable aléatoire, on pourrait
+essayer d'estimer la loi de cette dernière.
+
+En première approche on peut tester l'hypothèse selon laquelle cette variable
+aléatoire suit une loi exponentielle (le plus probable au vu des histogrammes
+tracés précédemment).
+
+```{r}
+# crée une séquence de 1 à 400000
+s <- seq(0,400000,1)
+# mesure
+lambda_mm <- 1/mean(df$stars)
+ggplot() +
+    # fonction de répartition mesurée
+    geom_line(aes(x = sort(df$stars, decreasing = FALSE), y = 1:n/n)) +
+    # loi exponentielle avec un paramètre estimé par méthode des moments
+    # pour ce jeu de données
+    geom_line(aes(x = s, y = pexp(s, rate = lambda_mm), color = 'red'))
+
+ggplot() +
+    # fonction de répartition mesurée
+    geom_line(aes(x = sort(df$stars, decreasing = FALSE), y = 1:n/n)) +
+    # loi exponentielle avec un paramètre estimé par méthode des moments
+    # pour ce jeu de données
+    geom_line(aes(x = s, y = pexp(s, rate = lambda_mm), color = 'red')) +
+    xlim(0,1000)
+```
+
+> explication relative à l'estimation de paramètre de lois par [méthode des
+moments](https://fr.wikipedia.org/wiki/M%C3%A9thode_des_moments_(statistiques)
+
+Graphiquement l'approximation par une loi exponentielle n'est pas très bonne.
+Il faudrait pousser l'analyse statistique plus loin pour conclure, ce qui n'est
+pas l'objet de cette analyse.
+
+Dans l'introduction de ce rapport, nous avions émis l'hypothèse selon laquelle
+le nombre d'étoile des dépôt se répartissait selon le principe de [Pareto](https://fr.wikipedia.org/wiki/Principe_de_Pareto).
+
+Selon ce principe, 20% des causes produisent 80% des effets. Dans notre cas, cela signifierait que 20% des dépôts de notre jeu de données représenteraient 80% du nombre total d'étoiles.
+
+On peut construire un diagramme de Pareto :
+
+```{r}
+p <- ggplot() +
+    geom_line(aes(x = (1:n)*100/n, y = cumsum(df$stars)*100/sum(df$stars))) +
+    labs(title = "Diagramme de Pareto du nombre d'étoiles en fonction des
+         dépôts",
+         x = "dépôts du jeu de données dans l'ordre décroissant du nombre d'étoiles, en %",
+         y = "% de la somme cumulée du nombre d'étoile de notre jeu de données") +
+    scale_y_continuous(breaks = seq(0,100,10)) +
+    scale_x_continuous(breaks = seq(0,100,10))
+p +
+    geom_vline(xintercept = 20,
+               linetype = "dashed",
+               color = "red") +
+    geom_hline(yintercept = 73,
+               linetype = "dashed",
+               color = "red")
+```
+
+Ce diagramme peut se lire ainsi : "20% des dépôts représentent 73% du nombre total d'étoiles de notre jeu de données".
+
+Comme sur ce graphique les dépôts sont classés par ordre décroissant d'étoiles,
+on peut dire que les 20% des dépôts ayant le plus d'étoiles ont à eux seul environ 73% des étoiles totales attribuées sur GitHub (avec le biais de sélection dont on a parlé plus haut).
+
+Le principe de Pareto s'applique donc dans une certaine mesure ici.
+
+#### 4.3 
