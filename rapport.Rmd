@@ -548,11 +548,123 @@ p +
                color = "red")
 ```
 
-Ce diagramme peut se lire ainsi : "20% des dépôts représentent 73% du nombre total d'étoiles de notre jeu de données".
+Ce diagramme peut se lire ainsi : "20% des dépôts (lecture sur l'axe des abscisses) représentent environ 73% (lecture sur l'axe des ordonnés) du nombre total d'étoiles de notre jeu de données".
 
 Comme sur ce graphique les dépôts sont classés par ordre décroissant d'étoiles,
 on peut dire que les 20% des dépôts ayant le plus d'étoiles ont à eux seul environ 73% des étoiles totales attribuées sur GitHub (avec le biais de sélection dont on a parlé plus haut).
 
 Le principe de Pareto s'applique donc dans une certaine mesure ici.
 
-#### 4.3 
+Si l'on considère le nombre d'étoile d'un dépôt comme un marqueur de
+sa "popularité", on peut ensuite se demander comment expliquer cette
+popularité.
+
+On dispose de plusieurs informations conernant les dépôts qui peuvent nous renseigner :
+
+- les langages utilisés
+- les *topics* (les tags associés au dépôt)
+- la date de création
+
+#### 4.3 La date création d'un dépot influence-t-elle sa popularité ?
+
+On peut par exemple penser que plus un dépôt est ancien, plus son
+nombre d'étoile est important. C'est un raisonnement plutôt naturel :
+ce qui est plus ancien à eu le temps de se faire connaître et donc de
+gagner en popularité.
+
+Notre dataset dispose d'un attribut `createdAt`.
+
+```{r}
+str(df$createdAt)
+```
+
+Les informations sont stockées dans un format `POSIXct` qui l'un des deux
+formats utilisés pour stocker des dates.
+
+Nous n'avons pas besoin de conserver une précision sur l'heure de création des dépôts, on peut donc commencer par ne regarder que la date :
+
+```{r}
+# On crée une nouvelle colonne au dataset en convertissant la date dans
+# un format plus simple : aaaa-mm-jj
+df <- df %>% mutate(creationDate = as.Date(createdAt))
+```
+
+```{r}
+# on crée les graduations en abscisse pour faciliter la lecture
+datebreaks <- seq(as.Date("2009-01-01"), as.Date("2024-01-01"), by = "1 year")
+
+ggplot(df, aes(x = creationDate, y = stars)) +
+    geom_point(size = 0.5) +
+    scale_x_date(breaks = datebreaks) +
+    # pour afficher les dates en biais
+    theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+    labs(title = "Nombre d'étoiles en fonction de la date de
+         création des dépôts",
+         x = "Date de création des dépôts",
+         y = "Nombre d'étoile des dépôts")
+```
+
+Sur ce graphique, les points qui se détachent de la base de points noirs sont
+ceux qui ont atteint un nombre important d'étoiles.
+
+On retrouve notre dépôt `freeCodeCamp` qui possède le plus d'étoile en haut au centre :
+
+```{r}
+ggplot(df, aes(x = creationDate, y = stars)) +
+    geom_point(size = 0.5) +
+    geom_point(aes(x = df[df$name == 'freeCodeCamp',]$creationDate,
+                   y = df[df$name == 'freeCodeCamp',]$stars),
+               shape = 1,
+               size = 6,
+               color = 'red') + 
+    scale_x_date(breaks = datebreaks) +
+    # pour afficher les dates en biais
+    theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+    labs(title = "Nombre d'étoiles en fonction de la date de
+         création des dépôts",
+         x = "Date de création des dépôts",
+         y = "Nombre d'étoile des dépôts")
+```
+
+Attention, encore une fois à l'échelle de ce graphique : comme nous avons une
+très forte disparité entre le nombre d'étoile des dépôts, nous affichons en même temps
+des dépôts avec un nombre d'étoile en centaine ($10^2$) et des dépôts avec 
+des centaines de milliers d'étoiles ($10^5$).
+
+Ce graphique nous montre très clairement que la date de création du dépôt n'influence en rien la popularité de ces derniers :
+on trouve des dépôts aujourd'hui populaire créés dans les premières années de GitHub (2009-2010), comme des dépôt populaire très récents (2023).
+
+<!-- Zone de test >
+
+```{r}
+# on crée les graduations en abscisse pour faciliter la lecture
+datebreaks <- seq(as.Date("2009-01-01"), as.Date("2024-01-01"), by = "1 year")
+
+ggplot(df, aes(x = creationDate, y = stars)) +
+    geom_point(size = 0.5) +
+    scale_y_log10() +
+    scale_x_date(breaks = datebreaks) +
+    # pour afficher les dates en biais
+    theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+    labs(title = "Nombre d'étoiles en fonction de la date de
+         création des dépôts",
+         x = "Date de création des dépôts",
+         y = "Nombre d'étoile des dépôts")
+```
+
+
+```{r}
+ggplot(df[df$stars >= 5000,], aes(x = creationDate, y = stars)) +
+    geom_point(size = 0.5) +
+    scale_x_date(breaks = datebreaks) +
+    # pour afficher les dates en biais
+    theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+    labs(title = "Nombre d'étoiles en fonction de la date de
+         création des dépôts",
+         x = "Date de création des dépôts",
+         y = "Nombre d'étoile des dépôts")
+```
+
+<!-- Fin -->
+
+zef
