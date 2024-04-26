@@ -270,6 +270,7 @@ le code correspondant.
 ```{r}
 # Chagre les librairies utiles
 library(tidyverse)
+library(ggrepel)
 ```
 
 Dans le dossier `.\data\githubStar1-10\` on dispose de 10 fichiers `.csv` qui possèdent 10000 éléments chacun soit 100000 éléments.
@@ -589,6 +590,10 @@ Nous n'avons pas besoin de conserver une précision sur l'heure de création des
 df <- df %>% mutate(creationDate = as.Date(createdAt))
 ```
 
+On va donc utiliser un [scatterplot](https://datavizcatalogue.com/methods/scatterplot.html)
+pour observer une possible corrélation entre la date de création et le nombre d'étoiles
+d'un dépôt.
+
 ```{r}
 # on crée les graduations en abscisse pour faciliter la lecture
 datebreaks <- seq(as.Date("2009-01-01"), as.Date("2024-01-01"), by = "1 year")
@@ -604,7 +609,8 @@ ggplot(df, aes(x = creationDate, y = stars)) +
          y = "Nombre d'étoile des dépôts")
 ```
 
-Sur ce graphique, les points qui se détachent de la base de points noirs sont
+Sur ce graphique, les points qui se détachent de la base de points noirs 
+(coordonnée $0e+00$ sur l'axe des ordonnés) sont
 ceux qui ont atteint un nombre important d'étoiles.
 
 On retrouve notre dépôt `freeCodeCamp` qui possède le plus d'étoile en haut au centre :
@@ -626,15 +632,17 @@ ggplot(df, aes(x = creationDate, y = stars)) +
          y = "Nombre d'étoile des dépôts")
 ```
 
-Attention, encore une fois à l'échelle de ce graphique : comme nous avons une
+Attention, encore une fois à l'échelle utilisée dans ce 
+graphique : comme nous avons une
 très forte disparité entre le nombre d'étoile des dépôts, nous affichons en même temps
-des dépôts avec un nombre d'étoile en centaine ($10^2$) et des dépôts avec 
+des dépôts avec un nombre d'étoile dans les centaine ($10^2$) et des dépôts avec 
 des centaines de milliers d'étoiles ($10^5$).
 
 Ce graphique nous montre très clairement que la date de création du dépôt n'influence en rien la popularité de ces derniers :
 on trouve des dépôts aujourd'hui populaire créés dans les premières années de GitHub (2009-2010), comme des dépôt populaire très récents (2023).
 
-<!-- Zone de test >
+Si l'on utilise une échelle logarithmique pour le nombre d'étoile on s'en rend mieux compte que
+les dépôts "populaires 
 
 ```{r}
 # on crée les graduations en abscisse pour faciliter la lecture
@@ -649,22 +657,60 @@ ggplot(df, aes(x = creationDate, y = stars)) +
     labs(title = "Nombre d'étoiles en fonction de la date de
          création des dépôts",
          x = "Date de création des dépôts",
-         y = "Nombre d'étoile des dépôts")
+         y = "Nombre d'étoile des dépôts",
+         subtitle = "Le nombre d'étoile est représenté par une échelle
+         logarithmique")
 ```
 
+On peut se convaincre en affichant la moyenne des étoiles des dépôts pour 
+chaque année création (la moyenne pour les dépôts créés entre 2009 et 2010, pour
+ceux créés entre 2010 et 2011, etc.).
 
 ```{r}
-ggplot(df[df$stars >= 5000,], aes(x = creationDate, y = stars)) +
-    geom_point(size = 0.5) +
+# On calcul la moyenne du nombre d'étoiles des dépôt en fonction de leurs
+# # date de création en divisant en années
+separation_annees <- paste(2009:2023,"-01-01",sep="")
+separation_annees[length(separation_annees)+1] <- as.character(max(df$creationDate))
+separation_annees[length(separation_annees)] <- as.character(as.Date(separation_annees[length(separation_annees)]) + 1)
+# nbr = 0
+mean_stars_by_year <- c()
+for (i in 2:length(separation_annees)) {
+    # nbr = nbr + dim(df[df$creationDate < separation_annees[i] &
+    #                   df$creationDate >= separation_annees[i-1],])[1]
+    # Pour vérifier le nombre d'éléments comptés
+    
+    mean_stars_by_year <- c(
+        mean_stars_by_year,
+        mean(df[df$creationDate < separation_annees[i] &
+           df$creationDate >= separation_annees[i-1],]$stars)
+    )
+}
+```
+
+```{r}
+ggplot() +
+    geom_point(aes(x = df$creationDate, y = df$stars), size = 0.5) +
+    geom_line(aes(x = as.Date(separation_annees[1:(length(separation_annees)-1)]),
+                  y = mean_stars_by_year), color = "red") +
+    scale_y_log10() +
     scale_x_date(breaks = datebreaks) +
     # pour afficher les dates en biais
     theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
     labs(title = "Nombre d'étoiles en fonction de la date de
          création des dépôts",
          x = "Date de création des dépôts",
-         y = "Nombre d'étoile des dépôts")
+         y = "Nombre d'étoile des dépôts",
+         subtitle = "Le nombre d'étoile est représenté par une échelle
+         logarithmique")
 ```
 
-<!-- Fin -->
+On voit bien que la moyenne reste relativement stable. On note une légère hausse
+en 2022 qui peut traduire une hausse de popularité de la plateforme.
 
-zef
+Le 25 janvier 2023, GitHub annonçait avoir atteint les [100 millions d'utilisateurs]
+(https://github.blog/2023-01-25-100-million-developers-and-counting/).
+
+On peut donc voir dans notre graphique un début d'une augmentation d'utlisateurs
+actifs sur la plateforme, sans pouvoir le confirmer.
+
+
