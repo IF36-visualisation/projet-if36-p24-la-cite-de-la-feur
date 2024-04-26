@@ -713,4 +713,119 @@ Le 25 janvier 2023, GitHub annonçait avoir atteint les [100 millions d'utilisat
 On peut donc voir dans notre graphique un début d'une augmentation d'utlisateurs
 actifs sur la plateforme, sans pouvoir le confirmer.
 
+#### 4.4 Existe-il un lien entre le nombre d'étoile et le nombre de de `watchers` ?
 
+Comme évoqué dans la présentation du jeu de données, nous disposons d'autres indicateurs
+de "popularité". L'un deux, nommé `watchers` dans le dataset, indique combien de
+personne "suivent" un dépôt.
+
+Si l'on reprend la métaphore d'un réseau social : un utlisateur peu *liker* un dépôt
+qu'il apprécie (ajoute une étoile *stars*) mais il peut également *follow* le dépôt
+pour être mit au courant des évolutions.
+
+On peut supposer qu'un dépôt ayant beaucoup d'étoiles aura aussi beaucoup de *watchers*
+qui souhaitent être informé des évolutions.
+
+On va donc confirmer ou non cette hypothèse à l'aide d'un [scatterplot](https://datavizcatalogue.com/methods/scatterplot.html).
+
+```{r}
+scplt_stars_watchers <- ggplot(df, aes(x = stars, y = watchers)) +
+  geom_point()
+scplt_stars_watchers
+```
+
+Tel quel le graphique n'est pas exploitable à cause de la très grandes disparités
+dans les valeurs de `stars` qui vient "tasser" la très
+grande majorité des points dans le coin infénieur gauche ("faibles" valeurs de
+`stars` et faibles valeurs de `watchers`)
+
+On peut commencer par tracer le même graphique en retirant tous les dépôts possèdant
+moins de 10000 étoiles.
+
+```{r}
+scplt_stars_watchers2 <- ggplot(df[df$stars <= 10000,],
+                               aes(x = stars, y = watchers)) +
+  geom_point()
+scplt_stars_watchers2
+```
+
+Contrairement à notre hypothèse de base, il semble que le nombre de `wathchers`
+n'évolue que très peu quelque soit le nombre d'étoile attribué au dépôt.
+
+On observe quelque dépôts qui sortent du lot (valeurs abérantes) qui possèdent 
+plus de `wathchers` que de `stars` (ce qui va à l'encontre de la très large 
+majorité des dépôts).
+
+```{r}
+scplt_stars_watchers3 <- ggplot(df[df$stars <= df$watchers,],
+                               aes(x = stars, y = watchers)) +
+  geom_point()
+scplt_stars_watchers3
+```
+
+Si l'on observe les noms de ces dépôts :
+
+```{r}
+# Liste complète
+# df[df$stars <= df$watchers,]$nameWithOwner
+head(df[df$stars <= df$watchers,]$nameWithOwner)
+```
+
+On remarque qu'il s'agit surtout de dépôt publics créés par des grandes entreprises
+comme Microsoft (les produits Azure entre autre), Uber, Netflix, Shopify, etc.
+
+On peut donc supposer que ces dépôt abritent le code source de programmes ré-utilisés
+par de nombreux développeurs (tel que des API ou des SDK : software development kit).
+
+Les entreprises ou développeurs utilisant ces programmes doivent donc souhaiter
+être tenu aà jours des évolutions (ce sont des `watchers`) sans pour autant *liker*
+le dépôt (sans prendre le temps de le faire).
+
+On peut donc supposer qu'il existe une relation linéaire entre les deux variables
+du type : $watchers = a \times stars + b$. Avec $a$ proche de 0.
+
+```{r}
+scplt_stars_watchers + geom_smooth()
+scplt_stars_watchers2 + geom_smooth()
+```
+
+```{r}
+lm(df$watchers~df$stars) %>% summary()
+lm(df$watchers~df$stars)$coefficients
+```
+
+Si on ajuste une droite de regression linéaire on obtient une droite du
+type : $watchers = 0.02587 \times stars + 16.11$.
+
+Cette hypothèse de linéarité doit cependant être traité avec prudence au vu du
+nuage de point que l'on a qui semble malgrès tout variable.
+
+Si l'on affiche que les dépôts ayant plus de 10000 étoiles on a :
+
+```{r}
+scplt_stars_watchers3 <- ggplot(df[df$stars > 10000,],
+                               aes(x = stars, y = watchers)) +
+  geom_point()
+scplt_stars_watchers3 + geom_smooth()
+```
+
+On observe un comportement très similaire (certaines valeurs extrêmes vont
+venir *tasser* les plus petites dans le coin infèrieur gauche) et on retrouve une
+relation linéaire.
+
+On peut observer le nuage de point complet en utilisant une échelle logarithmique.
+
+```{r}
+scplt_stars_watchers + scale_x_log10()
+```
+
+Attention dans ce cas : le graphique affiche une tendance non linéaire (polynômiale)
+pour les grandes valeurs de `stars`. Cependant cet effet est principalement
+dû à l'échelle logarithmique.
+
+La forme prise par le nuage de point est indique bel et bien une relation liénaire
+quand seul l'axe des abscisse est en échelle logarithmique.
+
+On peut donc en conclure qu'il existe bien une relation linéaire entre les deux
+grandeurs, même si on observe une grande variabilité dans les données avec quelques
+exeptions dont le comportement diffère.
