@@ -819,16 +819,16 @@ On peut observer le nuage de point complet en utilisant une échelle logarithmiq
 scplt_stars_watchers + scale_x_log10()
 ```
 
-Attention dans ce cas : le graphique affiche une tendance non linéaire (polynômiale)
+Attention dans ce cas : le graphique affiche une tendance non linéaire (polynomiale)
 pour les grandes valeurs de `stars`. Cependant cet effet est principalement
 dû à l'échelle logarithmique.
 
-La forme prise par le nuage de point est indique bel et bien une relation liénaire
+La forme prise par le nuage de point est indique bel et bien une relation linéaire
 quand seul l'axe des abscisse est en échelle logarithmique.
 
 On peut donc en conclure qu'il existe bien une relation linéaire entre les deux
 grandeurs, même si on observe une grande variabilité dans les données avec quelques
-exeptions dont le comportement diffère.
+exceptions dont le comportement diffère.
 
 ### 5. Analyser les tendances des langages de programmation : ***language***
 
