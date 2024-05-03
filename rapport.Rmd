@@ -778,7 +778,7 @@ On peut donc supposer que ces dépôt abritent le code source de programmes ré-
 par de nombreux développeurs (tel que des API ou des SDK : software development kit).
 
 Les entreprises ou développeurs utilisant ces programmes doivent donc souhaiter
-être tenu aà jours des évolutions (ce sont des `watchers`) sans pour autant *liker*
+être tenu à jours des évolutions (ce sont des `watchers`) sans pour autant *liker*
 le dépôt (sans prendre le temps de le faire).
 
 On peut donc supposer qu'il existe une relation linéaire entre les deux variables
