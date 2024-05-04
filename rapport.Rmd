@@ -2,7 +2,9 @@
 title: "Projet IF36"
 author: "Baptiste Toussaint"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 <!-- Zones de paramètres pour le rapport final -->
@@ -325,7 +327,7 @@ m <- dim(df)[2]
 
 ### 3.Plan de l'analyse
 
-### 4. Analyse du nombre d'étoiles : ***strars***
+### 4. Analyse du nombre d'étoiles : ***stars***
 
 #### 4.1 Notre interprétation du nombre d'étoile d'un dépôt sur GitHub
 
@@ -749,11 +751,11 @@ scplt_stars_watchers2 <- ggplot(df[df$stars <= 10000,],
 scplt_stars_watchers2
 ```
 
-Contrairement à notre hypothèse de base, il semble que le nombre de `wathchers`
+Contrairement à notre hypothèse de base, il semble que le nombre de `watchers`
 n'évolue que très peu quelque soit le nombre d'étoile attribué au dépôt.
 
 On observe quelque dépôts qui sortent du lot (valeurs abérantes) qui possèdent 
-plus de `wathchers` que de `stars` (ce qui va à l'encontre de la très large 
+plus de `watchers` que de `stars` (ce qui va à l'encontre de la très large 
 majorité des dépôts).
 
 ```{r}
@@ -778,7 +780,7 @@ On peut donc supposer que ces dépôt abritent le code source de programmes ré-
 par de nombreux développeurs (tel que des API ou des SDK : software development kit).
 
 Les entreprises ou développeurs utilisant ces programmes doivent donc souhaiter
-être tenu à jours des évolutions (ce sont des `watchers`) sans pour autant *liker*
+être tenu aà jours des évolutions (ce sont des `watchers`) sans pour autant *liker*
 le dépôt (sans prendre le temps de le faire).
 
 On peut donc supposer qu'il existe une relation linéaire entre les deux variables
@@ -819,112 +821,120 @@ On peut observer le nuage de point complet en utilisant une échelle logarithmiq
 scplt_stars_watchers + scale_x_log10()
 ```
 
-Attention dans ce cas : le graphique affiche une tendance non linéaire (polynomiale)
+Attention dans ce cas : le graphique affiche une tendance non linéaire (polynômiale)
 pour les grandes valeurs de `stars`. Cependant cet effet est principalement
 dû à l'échelle logarithmique.
 
-La forme prise par le nuage de point est indique bel et bien une relation linéaire
+La forme prise par le nuage de point est indique bel et bien une relation liénaire
 quand seul l'axe des abscisse est en échelle logarithmique.
 
 On peut donc en conclure qu'il existe bien une relation linéaire entre les deux
 grandeurs, même si on observe une grande variabilité dans les données avec quelques
-exceptions dont le comportement diffère.
+exeptions dont le comportement diffère.
 
-### 5. Analyser les tendances des langages de programmation : ***language***
+#### 4.5 Existe-il un relation entre le nombre d'étoile et le nombre de de `forks` ?
 
-#### 5.1 Attributs de choix lors de l'étude des tendances des langages
+Pour cet jeu de données, un autre attribut important est celui des `forks`, qui reflète dans une
+certaine mesure le degré de participation des utilisateurs dans un référentiel GitHub. Autrement
+dit, nous voulons comprendre la corrélation entre la popularité d'un projet et la participation.
 
-Au cœur de l'écosystème numérique, les langages de programmation jouent un rôle crucial dans le développement et l'évolution des logiciels. Comprendre l'évolution de l'utilisation des langages de programmation est essentiel pour saisir les dynamiques de l'industrie informatique, ainsi que pour guider nos propres choix. 
+Il convient de mentionner qu'en ce qui concerne le degré de participation, il peut y avoir des
+personnes qui participent directement à la contribution au code, ou il peut y avoir des
+personnes qui se contentent de *fork* un dépôt dans le but d'apprendre.
 
-Il existe deux attributs dans notre jue de données qui sont directement liés aux langages de programmation: `languages` et `primaryLanguage`.
+Pour deux attributs dans un jeu de données, calculer leur coefficient de corrélation est un bon
+moyen de trouver la relation entre eux. Ici, nous choisissons le coefficient de corrélation de
+Pearson et le coefficient de corrélation de rang de Spearman pour vérifier et découvrir la
+relation entre eux.
 
-Il existe un autre attribut lié au langage de programmation : `createdAt`. Lorsqu'il est observé avec `primaryLanguage`, il peut refléter le premier langage sélectionné lors de la création du projet. Lorsqu'il y a suffisamment d'échantillons, les langages de programmation populaires de chaque période peuvent être vus.
-
-Car d’autres attributs, tels que `stars`, `forks` et `watchers`, peuvent refléter dans une certaine mesure la popularité de la langue.
-
-#### 5.2 Popularité du langage de programmation
-
-Puisque certains référentiels n'indiquent pas le langage de programmation, nous ne considérerons pas ces référentiels:
-
-```{r}
-df_filtered <- df[df$languageCount > 0 , ]
-```
-
-Regroupez les données en fonction des attributs du langage de programmation et calculez la somme des étoiles, des forks et des observateurs pour chaque langage:
-
-```{r}
-language_pop <- df_filtered %>%
-  group_by(primaryLanguage) %>%
-  summarise(sum_stars = sum(stars),
-            sum_forks = sum(forks),
-            sum_watchers = sum(watchers))
-```
-
-Nous pouvons utiliser un nuage de points pour découvrir la distribution de popularité d'une langue en fonction des trois attributs `stars`, `forks` et `watchers`. Nous traçons le nombre total de `stars` sur l'axe des x, le nombre total de `forks` sur l'axe des y et le nombre total de `watchers` sur la taille en points:
+Les deux coefficients de corrélation prennent des valeurs comprises entre 1 et -1, 1 indiquant
+une corrélation élevée et 0 indiquant aucune corrélation. La différence est que le coefficient
+de corrélation de Pearson est plus sensible aux relations linéaires et que le coefficient de
+corrélation de rang de Spearman est plus sensible aux relations monotones entre les variables.
 
 ```{r}
 
-ggplot(data = language_pop[language_pop$sum_stars > 1000000,], aes(x = sum_stars, y = sum_forks, size = sum_watchers)) +
-  geom_point(aes(color = primaryLanguage), show.legend = FALSE) +  
-  geom_text(aes(label = primaryLanguage), size = 3, vjust = -0.5) +  
-  scale_size_continuous(name = "Watchers", range = c(1, 10)) +
-  labs(x = "Sum Stars", y = "Sum Forks", title = "Distribution de la popularité du langage de programmation GitHub") +
-  theme_minimal()
-
+correlation_pearson <- cor(df$stars, df$forks, method = "pearson")
+correlation_spearman <- cor(df$stars, df$forks, method = "spearman")
+print(correlation_pearson)
+print(correlation_spearman)
 ```
+Concrètement, ces deux coefficients nous disent :
 
-Nous pouvons diviser tous les langages de programmation en quatre niveaux selon le schéma :
+Coefficient de corrélation de Pearson : 0,5847746, indiquant qu'il existe un certain degré de
+corrélation linéaire entre `stars` et `forks`, mais la corrélation n'est pas très forte et est
+une corrélation modérée. Cela signifie que plus le nombre de `stars` d'un projet augmente, plus
+le nombre de `forks` augmente, et vice versa, mais l'ampleur du changement peut être
+relativement faible.
 
-- *T0：* Python, JavaScript
-- *T1：* Java
-- *T2：* C++, TypeScript, Go, C(peut-être)
-- *T3：* Les autres langues
+Coefficient de corrélation de rang de Spearman : 0,6531888, indiquant qu'il existe un certain
+degré de relation monotone entre `stars` et `forks`, mais il n'est pas nécessaire que la
+relation soit linéaire. Ce coefficient est légèrement supérieur au coefficient de corrélation de
+Pearson, ce qui indique que la relation entre `stars` et `forks` a tendance à être davantage une
+tendance monotone croissante, plutôt qu'une relation nécessairement linéaire stricte.
 
-#### 5.3 Tendances dans les langages de programmation grand public
-
-Après avoir vu les résultats ci-dessus, nous ne pouvons nous empêcher de nous demander quand Python et JavaScript sont-ils devenus si populaires ? Nous devons découvrir les tendances de ces langages de programmation.
-
-Mais avant cela, nous devons traiter spécialement notre ensemble de données：
-
-
+Considérant que le coefficient de corrélation de Pearson est très sensible aux valeurs
+aberrantes, nous essayons d'utiliser un [scatterplot](https://datavizcatalogue.com/methods/scatterplot.html) pour trouver ces valeurs aberrantes.
 
 ```{r}
 
-# Convertir CreateAt au format de date et extraire l'année
-df_filtered <- df_filtered %>%
-  mutate(year = lubridate::year(as.Date(createdAt)))
-
-# Regroupés par année et langage de programmation, comptez le nombre d'entrepôts dans chaque langue par an
-language_count <- df_filtered %>%
-  group_by(year, primaryLanguage) %>%
-  summarise(count = n()) %>%
-  ungroup()
-
-# Calculer le nombre cumulé de chaque langue par an
-language_count <- language_count %>%
-  group_by(primaryLanguage) %>%
-  mutate(cumulative_count = cumsum(count)) %>%
-  ungroup()
-
-
-# Filtrer les dix principales langues
-top_languages <- language_count %>%
-  group_by(primaryLanguage) %>%
-  summarise(total_count = sum(count)) %>%
-  top_n(10, total_count) %>%
-  pull(primaryLanguage)
-
-
+ggplot(df, aes(x = stars, y = forks)) +
+  geom_point() +  
+  geom_smooth(method = "gam", se = FALSE) +  #Puisque nous constatons qu’il n’existe pas nécessairement de relation linéaire entre ces deux attributs, nous utilisons la méthode gam pour l’ajuster.
+  labs(x = "Stars", y = "Forks", title = "Relation entre Stars et Forks")
 ```
+
+Nous avons constaté que certains dépôts ont un nombre de `stars` extrêmement faible, mais un
+nombre de `forks` extrêmement élevé. Il s'agit évidemment de valeurs aberrantes.
+
+Nous avons également remarqué que le nombre de `stars` de la plupart des dépôts est inférieur à
+10 000 et le nombre de `forks` est inférieur à 50 000. Afin d'étudier la relation entre le
+nombre d'étoiles et la fourchette, nous devons extraire la majorité des données.
 
 
 ```{r}
-# Dessiner un graphique linéaire
-ggplot(language_count %>% filter(primaryLanguage %in% top_languages), aes(x = year, y = cumulative_count, color = primaryLanguage)) +
-  geom_line() +
-  geom_text(data = language_count %>% filter(primaryLanguage %in% top_languages) %>% group_by(primaryLanguage) %>% filter(year == max(year)), aes(label = primaryLanguage), vjust = -0.5, nudge_y = 1000, check_overlap = TRUE) +
-  labs(x = "Year", y = "Nombre cumulé", title = "Nombre cumulé annuel de langues principales dans les 200 000 premiers référentiels classés par nombre d'étoiles") +
-  theme_minimal()
+ggplot(df[df$stars < 10000 & df$forks < 50000, ], aes(x = stars, y = forks)) +
+  geom_point() +  
+  geom_smooth(method = "gam", se = FALSE) +  
+  labs(title = "Relation entre Stars et Forks")
+
 ```
 
-Sur la figure, nous pouvons voir que python et JavaScript étaient les premiers langages de nombreux entrepôts au début, mais leur utilisation a considérablement augmenté vers 2016 et est finalement devenue le taux d'utilisation de ces deux langages que nous voyons maintenant.
+Affiner davantage la portée:
+
+```{r}
+ggplot(df[df$stars < 10000 & df$forks < 10000 , ], aes(x = stars, y = forks)) +
+  geom_point() +  
+  geom_smooth(method = "gam", se = FALSE) +  
+  labs(title = "Relation entre Stars et Forks")
+
+```
+
+Après avoir filtré de nombreuses valeurs aberrantes, nous essayons de recalculer les deux
+coefficients de corrélation et de les comparer avec les résultats du calcul précédent.
+
+```{r}
+
+correlation_pearson_ajuste <- cor(df[df$stars < 10000 & df$forks < 10000 , ]$stars, df[df$stars < 10000 & df$forks < 10000 , ]$forks, method = "pearson")
+correlation_spearman_ajuste <- cor(df[df$stars < 10000 & df$forks < 10000 , ]$stars, df[df$stars < 10000 & df$forks < 10000 , ]$forks, method = "spearman")
+print(correlation_pearson_ajuste)
+print(correlation_spearman_ajuste)
+print(correlation_pearson)
+print(correlation_spearman)
+```
+
+Nous pouvons constater que les deux coefficients de corrélation n’ont pas beaucoup changé.
+
+On peut donc dire qu'après avoir éliminé de nombreuses valeurs aberrantes, le coefficient de
+corrélation entre `stars` et `forks` montre toujours une corrélation positive modérée, ce qui
+montre qu'il existe effectivement un certain degré de corrélation entre elles, mais qu'il n'y a
+pas de relation linéaire évidente. Cette situation peut refléter la complexité et la diversité
+des données, c'est-à-dire que la popularité (`stars`) et la participation (`forks`) des dépôt
+sont affectées par de multiples facteurs et ne peuvent être simplement décrites par un modèle
+linéaire.
+
+Par conséquent, nous pouvons conclure que la relation entre `stars` et `forks` est
+statistiquement modérément positive, mais n'a pas de relation linéaire évidente et peut être
+affectée par divers facteurs. Cette conclusion contribue à une compréhension et une analyse plus
+approfondies de la relation entre la popularité des dépôts et la participation.
+
