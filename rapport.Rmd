@@ -21,8 +21,6 @@ rm(list=ls())
 
 <!-- Début du rapport -->
 
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Fj4cXJY4)
-
 # Analyse : GitHub Public Repository Metadata
 
 > Projet de *Data visualization* de l'unité d'enseignement IF36 de l'[Université de Technologie de Troyes (UTT)](https://www.utt.fr/).
@@ -792,15 +790,20 @@ scplt_stars_watchers2 + geom_smooth()
 ```
 
 ```{r}
-lm(df$watchers~df$stars) %>% summary()
 lm(df$watchers~df$stars)$coefficients
 ```
 
 Si on ajuste une droite de regression linéaire on obtient une droite du
 type : $watchers = 0.02587 \times stars + 16.11$.
 
-Cette hypothèse de linéarité doit cependant être traité avec prudence au vu du
-nuage de point que l'on a qui semble malgrès tout variable.
+Cette hypothèse de linéarité entre les deux 
+variables doit cependant être traité avec prudence au vu du
+nuage. On peut observer une tendance générale : plus un dépôt à d'étoile, plus
+il a tendance à avoir être suivi et donc avoir plus de `watchers`.
+Certains dépôts font exception à cette règle.
+
+On pourrait pousser l'analyse statistique pour définir la qualité d'adéquation
+d'un modèle linéaire.
 
 Si l'on affiche que les dépôts ayant plus de 10000 étoiles on a :
 
@@ -821,21 +824,21 @@ On peut observer le nuage de point complet en utilisant une échelle logarithmiq
 scplt_stars_watchers + scale_x_log10()
 ```
 
-Attention dans ce cas : le graphique affiche une tendance non linéaire (polynômiale)
+Attention dans ce cas : le graphique affiche une tendance non linéaire (exponentielle)
 pour les grandes valeurs de `stars`. Cependant cet effet est principalement
 dû à l'échelle logarithmique.
 
-La forme prise par le nuage de point est indique bel et bien une relation liénaire
+La forme prise par le nuage de point est indique bel et bien une relation linéaire
 quand seul l'axe des abscisse est en échelle logarithmique.
 
 On peut donc en conclure qu'il existe bien une relation linéaire entre les deux
 grandeurs, même si on observe une grande variabilité dans les données avec quelques
-exeptions dont le comportement diffère.
+exceptions dont le comportement diffère.
 
 #### 4.5 Existe-il un relation entre le nombre d'étoile et le nombre de de `forks` ?
 
 Pour cet jeu de données, un autre attribut important est celui des `forks`, qui reflète dans une
-certaine mesure le degré de participation des utilisateurs dans un référentiel GitHub. Autrement
+certaine mesure le degré de participation des utilisateurs dans un dépôt GitHub. Autrement
 dit, nous voulons comprendre la corrélation entre la popularité d'un projet et la participation.
 
 Il convient de mentionner qu'en ce qui concerne le degré de participation, il peut y avoir des
