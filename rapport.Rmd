@@ -5,6 +5,7 @@ date: "`r Sys.Date()`"
 output:
   pdf_document: default
   html_document: default
+urlcolor: blue
 ---
 
 <!-- Zones de paramètres pour le rapport final -->
@@ -39,7 +40,9 @@ Langue : Français
 
 #### 1.1. Présentation de GitHub
 
-<center><img src="./src/img/GitHub_Logo.png" alt="Logo de la mascotte de GitHub" width="200" margin="20"/> <img src="./src/img/github-mark.png" alt="Logo de GitHub" width="100" margin="20"/></center>
+![Logo de la mascotte de GitHub](./src/img/GitHub_Logo.png){width=20% height=20%}
+
+![Logo de GitHub](./src/img/github-mark.png){width=20% height=20%}
 
 > Logo de GitHub et de sa mascotte : Octocat
 
@@ -517,8 +520,8 @@ ggplot() +
     xlim(0,1000)
 ```
 
-> explication relative à l'estimation de paramètre de lois par [méthode des
-moments](https://fr.wikipedia.org/wiki/M%C3%A9thode_des_moments_(statistiques)
+explication relative à l'estimation de paramètre de lois
+par [méthode des moments](https://fr.wikipedia.org/wiki/M%C3%A9thode_des_moments_(statistiques))
 
 Graphiquement l'approximation par une loi exponentielle n'est pas très bonne.
 Il faudrait pousser l'analyse statistique plus loin pour conclure, ce qui n'est
@@ -707,8 +710,7 @@ ggplot() +
 On voit bien que la moyenne reste relativement stable. On note une légère hausse
 en 2022 qui peut traduire une hausse de popularité de la plateforme.
 
-Le 25 janvier 2023, GitHub annonçait avoir atteint les [100 millions d'utilisateurs]
-(https://github.blog/2023-01-25-100-million-developers-and-counting/).
+Le 25 janvier 2023, GitHub annonçait avoir atteint les [100 millions d'utilisateurs](https://github.blog/2023-01-25-100-million-developers-and-counting/).
 
 On peut donc voir dans notre graphique un début d'une augmentation d'utlisateurs
 actifs sur la plateforme, sans pouvoir le confirmer.
