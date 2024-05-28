@@ -3,8 +3,8 @@ title: "Projet IF36"
 author: "Baptiste Toussaint"
 date: "`r Sys.Date()`"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 urlcolor: blue
 ---
 
@@ -994,10 +994,6 @@ relation linéaire.
 
 On peut observer le nuage de point complet en utilisant une échelle logarithmique.
 
-```{r}
-scplt_stars_watchers + scale_x_log10()
-```
-
 Attention dans ce cas : le graphique affiche une tendance non linéaire (exponentielle)
 pour les grandes valeurs de `stars`. Cependant cet effet est principalement
 dû à l'échelle logarithmique.
@@ -1069,7 +1065,8 @@ aberrantes, nous essayons d'utiliser un [scatterplot](https://datavizcatalogue.c
 ggplot(df, aes(x = stars, y = forks)) +
   geom_point() +  
   geom_smooth(method = "gam", se = FALSE) +  #Puisque nous constatons qu’il n’existe pas nécessairement de relation linéaire entre ces deux attributs, nous utilisons la méthode gam pour l’ajuster.
-  labs(x = "Stars", y = "Forks", title = "Relation entre Stars et Forks")
+  labs(x = "Stars", y = "Forks", title = "Relation entre Stars et Forks") +
+  custom_theme
 ```
 
 Nous avons constaté que certains dépôts ont un nombre de `stars` extrêmement faible, mais un
@@ -1084,7 +1081,8 @@ nombre d'étoiles et la fourchette, nous devons extraire la majorité des donné
 ggplot(df[df$stars < 10000 & df$forks < 50000, ], aes(x = stars, y = forks)) +
   geom_point() +  
   geom_smooth(method = "gam", se = FALSE) +  
-  labs(title = "Relation entre Stars et Forks")
+  labs(title = "Relation entre Stars et Forks") +
+  custom_theme
 
 ```
 
@@ -1094,7 +1092,8 @@ Affiner davantage la portée:
 ggplot(df[df$stars < 10000 & df$forks < 10000 , ], aes(x = stars, y = forks)) +
   geom_point() +  
   geom_smooth(method = "gam", se = FALSE) +  
-  labs(title = "Relation entre Stars et Forks")
+  labs(title = "Relation entre Stars et Forks") +
+  custom_theme
 
 ```
 
