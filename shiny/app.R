@@ -3,9 +3,12 @@
 # Le fichier server contient les fonctions de routine métier
 
 # nettoie la mémoire
-# rm(list=ls())
+rm(list=ls())
 
 library(tidyverse)
+library(shiny)
+library(shinydashboard)
+library(DT)
 
 source("./server.R")
 source("./ui.R")
