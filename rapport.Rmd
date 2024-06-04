@@ -831,6 +831,7 @@ for (i in 2:length(separation_annees)) {
 ```
 
 ```{r}
+datebreaks <- seq(as.Date("2009-01-01"), as.Date("2024-01-01"), by = "1 year")
 ggplot() +
   geom_point(aes(x = df[df$stars > 130,]$creationDate,
                  y = df[df$stars > 130,]$stars), size = 0.5) +
@@ -1124,4 +1125,3 @@ Par conséquent, nous pouvons conclure que la relation entre `stars` et `forks` 
 statistiquement modérément positive, mais n'a pas de relation linéaire évidente et peut être
 affectée par divers facteurs. Cette conclusion contribue à une compréhension et une analyse plus
 approfondies de la relation entre la popularité des dépôts et la participation.
-
