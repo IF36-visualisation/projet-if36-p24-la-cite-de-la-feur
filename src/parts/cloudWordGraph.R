@@ -17,7 +17,7 @@ df <- df <- read_csv("../../data/data_1_200000_noDuplicates.csv")
 
 # Appliqué à tous les dépôts
 text <- df$languages
-pattern <- "'name': '[a-zA-Z]+"
+pattern <- "'name': '[^']+"
 matching <- str_extract_all(text, pattern)
 langages <- mapply(matching,
 				   FUN = substr,
