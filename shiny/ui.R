@@ -19,18 +19,22 @@ ui <- dashboardPage(
 	
 	# Navigation
 	dashboardSidebar(
-		# Onglet présentation des données
-		menuItem(
-			"Présentation des données",
-			tabName = "presentData",
-			icon = icon("dashboard")
-		),
-		
-		# Onglet Répartition des stars
-		menuItem(
-			"Attribution des étoiles",
-			tabName = "repartitionStars",
-			icon = icon("th")
+		sidebarMenu(
+			id = 'tabs',
+			# Onglet présentation des données
+			menuItem(
+				"Présentation des données",
+				tabName = "presentData",
+				icon = icon("dashboard")
+			),
+			
+			# Onglet Répartition des stars
+			menuItem(
+				"Répartition des étoiles",
+				tabName = "repartitionStars",
+				icon = icon("th")
+			),
+			selected = "presentData"
 		)
 	),
 	
