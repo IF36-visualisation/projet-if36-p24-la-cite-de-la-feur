@@ -1,0 +1,790 @@
+# 2. Première étude : mesurer la popularité des dépôts
+
+## 2.1 Notre interprétation du nombre d'étoile d'un dépôt sur GitHub
+
+Le fichier `data_1_200000.csv` contenu dans l'objet `df` contient les 200000 dépôts
+possédant le plus d'étoiles (***stars***) sur GitHub au 25 février 2024.
+
+Sur GitHub, les étoiles jouent un rôle similaire à celui des *likes* sur les
+réseaux-sociaux classiques. Ainsi, on peut partir du postulat que nous disposons
+d'informations relatives aux ***repo*** les plus "populaires" de GitHub.
+
+Les raisons qui peuvent pousser un utilisateur à *liker* un dépôt sont nombreuses :
+conserver le projet dans son historique personnel pour y revenir plus tard,
+signifier que l'on apprécie ce dépôt, etc.
+
+Nous considérerons ici le nombre d'étoile comme un indicateur de "popularité"
+sans s'attarder sur une définition formelle de la "popularité".
+
+## 2.2 Comment se répartissent le nombre d'étoile sur la plateforme ?
+
+La première question que nous pouvons nous poser concerne la répartition du nombre
+d'étoiles sur GitHub. Si l'on considère le nombre d'étoile comme une variable
+quantitative aléatoire discrète, comment se répartissent les valeurs de cette
+variable ? On peut s'attendre à avoir un très petit nombre de projets ayant
+un grand nombre d'étoiles et la majorité des projets autour d'une dizaine.
+
+Pour rappel, notre jeu de données comporte un biais certain : le créateur à
+initialement regroupé les dépôts **publics** (donc visibles de tous, ce qui écarte
+la majorité des dépôts GitHub qui sont privés) ayant 5 étoiles ou plus. On peut
+supposer que l'écrasante majorité des dépôts du site ont moins de 5 étoiles (
+c'est par exemple le cas de l'ensemble des projets présents sur nos GitHub respectifs, étant des projets personnels ou académiques).
+
+Nous avons ensuite choisit de ne conserver que les 200000 premiers dépôts, soit
+les dépôts ayant le plus d'étoiles.
+
+Nous travaillons donc sur les 200000 projets ayant le plus d'étoiles sur GitHub.
+
+Pour simplifier le travail, je propose de trier le dataset en fonction du
+nombre d'étoile dans l'ordre décroisant
+
+```{r}
+df <- df %>% arrange(desc(stars))
+```
+
+
+Pour répondre à cette question, on peut utiliser un [`Density Plot`](https://datavizcatalogue.com/methods/density_plot.html) pour visualiser la
+distribution de cette variable.
+
+```{r}
+ggplot(data = df) +
+    geom_density(aes(x = stars)) +
+    labs(x = "Nombre d'étoiles ('stars')",
+         y = "Fréquence",
+         title = "Répartition du nombre d'étoiles des dépôts") +
+  custom_theme
+```
+
+En tant que tel, ce premier graphique n'est pas interprétable. On comprend seulement que
+certains dépôts ont plus de 300000 étoiles (ont peut lire `3e+05` sur l'échelle des abscisses)
+là ou la majorité sont proches de `0e+00` et ont donc un nombre d'étoiles dans l'ordre de la centaine ou du millier.
+
+De plus, les fréquences indiquées sont difficilement manipulables par le cerveau
+humain : on préférera afficher le nombre de dépôt (nombre d'entrée dans le dataset) que la fréquence.
+
+On peut identifier les valeurs minimum et maximum d'étoiles de notre dataset :
+```{r}
+sprintf("Nombre maximum d'étoiles : %d", max(df$stars))
+sprintf("Nombre minimum d'étoiles : %d", min(df$stars))
+```
+
+Le projet ayant le moins d'étoile en possède 97 (la sélection décrite
+plus haut masque la très grande majorité des dépôts du jeu de donnée initial qui ont donc moins de 97 étoiles). Le projet ayant le plus d'étoile en possède 371122.
+
+On peut afficher les données en découpant en 4 sous-jeu :
+
+- les dépôts entre 97 et 1000 étoiles
+- les dépôts entre 1000 et 10000 étoiles
+- les dépôts à plus de 10000 étoiles
+- les 1000 dépôts ayant le plus détoiles
+
+grâce à notre DashBoard joint à ce rapport nous pouvons jouer sur les intervalles
+
+![Capture d'écran du dashboard](../img/dashboard_hist_etoiles.png)
+
+```{r echo=FALSE}
+# les dépôts entre 97 et 1000 étoiles
+p1 <- ggplot(data = df[df$stars <= 1000,]) +
+  # Ajoute la géométrie histogramme
+  geom_histogram(aes(x = stars),
+                 # breaks sert à définir les séparations des barres
+                 breaks = seq(0,1000,10)) +
+  labs(x = "Nombre d'étoiles ('stars') par classes de 10",
+       y = "Nombre de dépôts",
+       title = "Répartition du nombre d'étoiles
+         pour les dépôts avec 1000 étoiles ou moins") +
+  custom_theme
+
+# les dépôts entre 1000 et 10000 étoiles
+p2 <- ggplot(data = df[df$stars > 1000 & df$stars < 10000,]) +
+  # Ajoute la géométrie histogramme
+  geom_histogram(aes(x = stars),
+                 # breaks sert à définir les séparations des barres
+                 breaks = seq(1000,10000,100)) +
+  labs(x = "Nombre d'étoiles ('stars') par classes de 100",
+       y = "Nombre de dépôts",
+       title = "Répartition du nombre d'étoiles
+         pour les dépôts entre 1000 et 10000 étoiles ou moins") +
+  custom_theme
+
+# les dépots à plus de 10000 étoiles
+p3 <- ggplot(data = df[df$stars >= 10000,]) +
+  # Ajoute la géométrie histogramme
+  geom_histogram(aes(x = stars)) + 
+  labs(x = "Nombre d'étoiles ('stars') par classes de 30",
+       y = "Nombre de dépôts",
+       title = "Répartition du nombre d'étoiles des dépôts
+         pour les dépôts avec plus de 10000 étoiles") +
+  custom_theme
+
+# les 1000 dépots avec le plus d'étoiles
+# le dataset df est déjà trié par nombre d'étoiles décroissante
+p4 <- ggplot(data = df[1:1000,]) +
+  # Ajoute la géométrie histogramme
+  geom_histogram(aes(x = stars)) + 
+  labs(x = "Nombre d'étoiles ('stars') par classes de 30",
+       y = "Nombre de dépôts",
+       title = "Répartition du nombre d'étoiles des dépôts
+         pour les dépôts avec le plus d'étoiles") +
+  custom_theme
+
+p1
+p2
+p3
+p4
+```
+
+Quel que soit la partie de nos données que l'on souhaite observer, on retrouve une
+structure similaire, avec la majorité des dépôts sur le début de notre intervalle
+d'observation.
+
+<!--
+Je propose à ce stade de retirer les dépôts ayant plus de 10000 étoiles :
+```{r}
+df[df$stars > 10000,] %>% nrow()
+```
+
+ce qui représente 3089 dépôts sur nos 194196.
+
+Je propose donc de séparer l'analyse en deux :
+- pour les projets ayant plus de 10000 étoiles ;
+- pour les projets ayant 10000 étoiles ou moins.
+
+Je propose aussi d'utiliser un histogramme : ce type de graphique est plus adapté dans notre cas car il permet de définir des "classes" pour ranger nos dépôts.
+
+```{r}
+# Histogramme avec les dépôts stars <= 10000
+ggplot(data = df[df$stars <= 10000,]) +
+    # Ajoute la géométrie histogramme
+    geom_histogram(aes(x = stars),
+                   # breaks sert à définir les séparations des barres
+                   breaks = seq(0,10000,100)) +
+    labs(x = "Nombre d'étoiles ('stars') par classes de 100",
+         y = "Nombre de dépôts",
+         title = "Répartition du nombre d'étoiles des dépôts
+         pour les dépôts avec 10000 étoiles ou moins") +
+  custom_theme
+```
+
+On comprend avec ce second graphique que la majorité des dépôts ont moins de
+2500 étoiles et quelque uns en ont plus de 5000.
+
+On peut ensuite afficher uniquement les dépôts ayant plus de 10000 étoiles.
+
+```{r}
+ggplot(data = df[df$stars >= 10000,]) +
+    # Ajoute la géométrie histogramme
+    geom_histogram(aes(x = stars)) + 
+    labs(x = "Nombre d'étoiles ('stars') par classes de 100",
+         y = "Nombre de dépôts",
+         title = "Répartition du nombre d'étoiles des dépôts
+         pour les dépôts avec plus de 10000 étoiles")
+```
+Bien que l'échelle ne soit plus la même (on atteint $3\times 10^5$ pour notre dépôt à 371122 étoiles), on retrouve une distribution très similaire.
+
+Si l'on se restreint avec les 1000 dépôts avec le plus d'étoiles on a :
+
+```{r}
+# le dataset df est déjà trié par nombre d'étoiles décroissante
+ggplot(data = df[1:1000,]) +
+    # Ajoute la géométrie histogramme
+    geom_histogram(aes(x = stars)) + 
+    labs(x = "Nombre d'étoiles ('stars') par classes de 100",
+         y = "Nombre de dépôts",
+         title = "Répartition du nombre d'étoiles des dépôts
+         pour les dépôts avec plus de 10000 étoiles") +
+  custom_theme
+```
+
+Il semble que l'on retrouve encore une distribution avec une forme similaire.
+
+-->
+
+On peut conclure que notre hypothèse de base était la bonne : la majorité des
+dépôts ont peu d'étoiles ("peu d'étoile" relativement à notre échantillon, soit entre 97 et 1000) et quelque uns arrivent à monter plus haut, voir pour certains atteindre des centaines de milliers.
+
+Pour appuyer cette remarque on peut regarder les 10 dépôts ayant le plus d'étoiles.
+
+```{r}
+library("ggrepel")
+ggplot(arrange(df[1:10,],stars),
+       aes(x = 1:10, y = stars)) +
+    geom_point() +
+    geom_text_repel(aes(label = name)) +
+    # on ajoute une graduation pour ne pas couper le label du 10 élément
+    xlim(0,11) +
+    labs(title = "Nombre d'étoile des 10 projets en ayant le plus
+         sur GitHub",
+         x = " ",
+         y = "Nombre d'étoiles") +
+    # améliorer l'échelle affichée pour les ordonnés
+    scale_y_continuous(breaks = seq(200000,400000,10000)) +
+    # retire l'échelle en abscisse
+    theme(axis.text.x = element_blank(),
+          axis.ticks = element_blank()) +
+  custom_theme
+```
+
+On remarque immédiatement qu'il y a plus de 100000 étoiles de différence entre le dépôt `freeCodeCamp` qui en possède 371122 et le dépôt `react` qui en possède 211912.
+
+```{r}
+sprintf("Nombre d'étoiles de %s : %d", df[1,]$name, df[1,]$stars)
+sprintf("Nombre d'étoiles de %s : %d", df[10,]$name, df[10,]$stars)
+```
+
+L'augmentation du nombre d'étoile n'est absolument pas linéaire et grimper dans
+le classement de *popularité* est de plus en plus difficile à mesure que l'on
+progresse.
+
+Si l'on considère le nombre d'étoile comme une variable aléatoire, on pourrait
+essayer d'estimer la loi de cette dernière.
+
+En première approche on peut tester l'hypothèse selon laquelle cette variable
+aléatoire suit une loi exponentielle (le plus probable au vu des histogrammes
+tracés précédemment).
+
+```{r}
+# crée une séquence de 1 à 400000
+s <- seq(0,400000,1)
+# mesure
+lambda_mm <- 1/mean(df$stars)
+ggplot() +
+  # fonction de répartition mesurée
+  geom_line(aes(x = sort(df$stars, decreasing = FALSE), y = 1:n/n)) +
+  # loi exponentielle avec un paramètre estimé par méthode des moments
+  # pour ce jeu de données
+  geom_line(aes(x = s, y = pexp(s, rate = lambda_mm), color = 'red')) +
+  custom_theme
+
+ggplot() +
+  # fonction de répartition mesurée
+  geom_line(aes(x = sort(df$stars, decreasing = FALSE), y = 1:n/n)) +
+  # loi exponentielle avec un paramètre estimé par méthode des moments
+  # pour ce jeu de données
+  geom_line(aes(x = s, y = pexp(s, rate = lambda_mm), color = 'red')) +
+  xlim(0,1000) +
+  custom_theme
+```
+
+explication relative à l'estimation de paramètre de lois
+par [méthode des moments](https://fr.wikipedia.org/wiki/M%C3%A9thode_des_moments_(statistiques))
+
+Graphiquement l'approximation par une loi exponentielle n'est pas très bonne.
+Il faudrait pousser l'analyse statistique plus loin pour conclure, ce qui n'est
+pas l'objet de cette analyse.
+
+Dans l'introduction de ce rapport, nous avions émis l'hypothèse selon laquelle
+le nombre d'étoile des dépôt se répartissait selon le principe de [Pareto](https://fr.wikipedia.org/wiki/Principe_de_Pareto).
+
+Selon ce principe, 20% des causes produisent 80% des effets. Dans notre cas, cela signifierait que 20% des dépôts de notre jeu de données représenteraient 80% du nombre total d'étoiles.
+
+On peut construire un diagramme de Pareto :
+
+```{r}
+p <- ggplot() +
+    geom_line(aes(x = (1:n)*100/n, y = cumsum(df$stars)*100/sum(df$stars))) +
+    labs(title = "Diagramme de Pareto du nombre d'étoiles en fonction des
+         dépôts",
+         x = "dépôts du jeu de données dans l'ordre décroissant du nombre d'étoiles, en %",
+         y = "% de la somme cumulée du nombre d'étoile de notre jeu de données") +
+    scale_y_continuous(breaks = seq(0,100,10)) +
+    scale_x_continuous(breaks = seq(0,100,10))
+p +
+    geom_vline(xintercept = 20,
+               linetype = "dashed",
+               color = "red") +
+    geom_hline(yintercept = 73,
+               linetype = "dashed",
+               color = "red") +
+  custom_theme
+```
+
+Ce diagramme peut se lire ainsi : "20% des dépôts (lecture sur l'axe des abscisses) représentent environ 73% (lecture sur l'axe des ordonnés) du nombre total d'étoiles de notre jeu de données".
+
+Comme sur ce graphique les dépôts sont classés par ordre décroissant d'étoiles,
+on peut dire que les 20% des dépôts ayant le plus d'étoiles ont à eux seul environ 73% des étoiles totales attribuées sur GitHub (avec le biais de sélection dont on a parlé plus haut).
+
+Le principe de Pareto s'applique donc dans une certaine mesure ici.
+
+Si l'on considère le nombre d'étoile d'un dépôt comme un marqueur de
+sa "popularité", on peut ensuite se demander comment expliquer cette
+popularité.
+
+On dispose de plusieurs informations conernant les dépôts qui peuvent nous renseigner :
+
+- les langages utilisés
+- les *topics* (les tags associés au dépôt)
+- la date de création
+
+## 2.3 La date création d'un dépot influence-t-elle sa popularité ?
+
+On peut par exemple penser que plus un dépôt est ancien, plus son
+nombre d'étoile est important. C'est un raisonnement plutôt naturel :
+ce qui est plus ancien à eu le temps de se faire connaître et donc de
+gagner en popularité.
+
+Notre dataset dispose d'un attribut `createdAt`.
+
+```{r}
+str(df$createdAt)
+```
+
+Les informations sont stockées dans un format `POSIXct` qui l'un des deux
+formats utilisés pour stocker des dates.
+
+Nous n'avons pas besoin de conserver une précision sur l'heure de création des dépôts, on peut donc commencer par ne regarder que la date :
+
+```{r}
+# On crée une nouvelle colonne au dataset en convertissant la date dans
+# un format plus simple : aaaa-mm-jj
+df <- df %>% mutate(creationDate = as.Date(createdAt))
+```
+
+On va donc utiliser un [scatterplot](https://datavizcatalogue.com/methods/scatterplot.html)
+pour observer une possible corrélation entre la date de création et le nombre d'étoiles
+d'un dépôt.
+
+On utilise directement une échelle logarithmique pour éviter d'avoir un effet de
+"tassement" des dépôts à cause des différences extrêmes dans les ordres de grandeur.
+
+<!--
+```{r}
+# on crée les graduations en abscisse pour faciliter la lecture
+datebreaks <- seq(as.Date("2009-01-01"), as.Date("2024-01-01"), by = "1 year")
+
+ggplot(df, aes(x = creationDate, y = stars)) +
+    geom_point(size = 0.5) +
+    scale_x_date(breaks = datebreaks) +
+    # pour afficher les dates en biais
+    theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+    labs(title = "Nombre d'étoiles en fonction de la date de
+         création des dépôts",
+         x = "Date de création des dépôts",
+         y = "Nombre d'étoile des dépôts") +
+  custom_theme
+```
+
+Sur ce graphique, les points qui se détachent de la base de points noirs 
+(coordonnée $0e+00$ sur l'axe des ordonnés) sont
+ceux qui ont atteint un nombre important d'étoiles.
+
+On retrouve notre dépôt `freeCodeCamp` qui possède le plus d'étoile en haut au centre :
+
+```{r}
+ggplot(df, aes(x = creationDate, y = stars)) +
+    geom_point(size = 0.5) +
+    geom_point(aes(x = df[df$name == 'freeCodeCamp',]$creationDate,
+                   y = df[df$name == 'freeCodeCamp',]$stars),
+               shape = 1,
+               size = 6,
+               color = 'red') + 
+    scale_x_date(breaks = datebreaks) +
+    # pour afficher les dates en biais
+    theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+    labs(title = "Nombre d'étoiles en fonction de la date de
+         création des dépôts",
+         x = "Date de création des dépôts",
+         y = "Nombre d'étoile des dépôts")
+```
+
+Attention, encore une fois à l'échelle utilisée dans ce 
+graphique : comme nous avons une
+très forte disparité entre le nombre d'étoile des dépôts, nous affichons en même temps
+des dépôts avec un nombre d'étoile dans les centaine ($10^2$) et des dépôts avec 
+des centaines de milliers d'étoiles ($10^5$).
+
+Ce graphique nous montre très clairement que la date de création du dépôt n'influence en rien la popularité de ces derniers :
+on trouve des dépôts aujourd'hui populaire créés dans les premières années de GitHub (2009-2010), comme des dépôt populaire très récents (2023).
+
+Si l'on utilise une échelle logarithmique pour le nombre d'étoile on s'en rend mieux compte que
+les dépôts "populaires 
+
+```{r}
+# on crée les graduations en abscisse pour faciliter la lecture
+datebreaks <- seq(as.Date("2009-01-01"), as.Date("2024-01-01"), by = "1 year")
+
+ggplot(df, aes(x = creationDate, y = stars)) +
+    geom_point(size = 0.5) +
+    scale_y_log10() +
+    scale_x_date(breaks = datebreaks) +
+    # pour afficher les dates en biais
+    theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+    labs(title = "Nombre d'étoiles en fonction de la date de
+         création des dépôts",
+         x = "Date de création des dépôts",
+         y = "Nombre d'étoile des dépôts",
+         subtitle = "Le nombre d'étoile est représenté par une échelle
+         logarithmique")
+```
+
+On peut se convaincre en affichant la moyenne des étoiles des dépôts pour 
+chaque année création (la moyenne pour les dépôts créés entre 2009 et 2010, pour
+ceux créés entre 2010 et 2011, etc.).
+
+```{r}
+# On calcul la moyenne du nombre d'étoiles des dépôt en fonction de leurs
+# # date de création en divisant en années
+separation_annees <- paste(2009:2023,"-01-01",sep="")
+separation_annees[length(separation_annees)+1] <- as.character(max(df$creationDate))
+separation_annees[length(separation_annees)] <- as.character(as.Date(separation_annees[length(separation_annees)]) + 1)
+# nbr = 0
+mean_stars_by_year <- c()
+for (i in 2:length(separation_annees)) {
+    # nbr = nbr + dim(df[df$creationDate < separation_annees[i] &
+    #                   df$creationDate >= separation_annees[i-1],])[1]
+    # Pour vérifier le nombre d'éléments comptés
+    
+    mean_stars_by_year <- c(
+        mean_stars_by_year,
+        mean(df[df$creationDate < separation_annees[i] &
+           df$creationDate >= separation_annees[i-1],]$stars)
+    )
+}
+```
+
+```{r}
+ggplot() +
+    geom_point(aes(x = df$creationDate, y = df$stars), size = 0.5) +
+    geom_line(aes(x = as.Date(separation_annees[1:(length(separation_annees)-1)]),
+                  y = mean_stars_by_year), color = "red") +
+    scale_y_log10() +
+    scale_x_date(breaks = datebreaks) +
+    # pour afficher les dates en biais
+    theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+    labs(title = "Nombre d'étoiles en fonction de la date de
+         création des dépôts",
+         x = "Date de création des dépôts",
+         y = "Nombre d'étoile des dépôts",
+         subtitle = "Le nombre d'étoile est représenté par une échelle
+         logarithmique")
+```
+
+On voit bien que la moyenne reste relativement stable. On note une légère hausse
+en 2022 qui peut traduire une hausse de popularité de la plateforme.
+
+Le 25 janvier 2023, GitHub annonçait avoir atteint les [100 millions d'utilisateurs](https://github.blog/2023-01-25-100-million-developers-and-counting/).
+
+On peut donc voir dans notre graphique un début d'une augmentation d'utlisateurs
+actifs sur la plateforme, sans pouvoir le confirmer.
+
+-->
+
+On ajoute aussi au graphique la moyenne des étoiles des dépôts pour 
+chaque année création (la moyenne pour les dépôts créés entre 2009 et 2010, pour
+ceux créés entre 2010 et 2011, etc.)
+
+```{r}
+# On calcul la moyenne du nombre d'étoiles des dépôt en fonction de leurs
+# # date de création en divisant en années
+separation_annees <- paste(2009:2023,"-01-01",sep="")
+separation_annees[length(separation_annees)+1] <- as.character(max(df$creationDate))
+separation_annees[length(separation_annees)] <- as.character(as.Date(separation_annees[length(separation_annees)]) + 1)
+# nbr = 0
+mean_stars_by_year <- c()
+for (i in 2:length(separation_annees)) {
+    # nbr = nbr + dim(df[df$creationDate < separation_annees[i] &
+    #                   df$creationDate >= separation_annees[i-1],])[1]
+    # Pour vérifier le nombre d'éléments comptés
+    
+    mean_stars_by_year <- c(
+        mean_stars_by_year,
+        mean(df[df$creationDate < separation_annees[i] &
+           df$creationDate >= separation_annees[i-1],]$stars)
+    )
+}
+```
+
+```{r}
+datebreaks <- seq(as.Date("2009-01-01"), as.Date("2024-01-01"), by = "1 year")
+ggplot() +
+  geom_point(aes(x = df[df$stars > 130,]$creationDate,
+                 y = df[df$stars > 130,]$stars), size = 0.5) +
+  geom_point(aes(x = df[df$name == 'freeCodeCamp',]$creationDate,
+                 y = df[df$name == 'freeCodeCamp',]$stars),
+             shape = 1,
+             size = 6,
+             color = 'red') +
+  geom_line(aes(x = as.Date(separation_annees[1:(length(separation_annees)-1)]),
+                y = mean_stars_by_year), color = "red") +
+  scale_y_log10() +
+  scale_x_date(breaks = datebreaks) +
+  # pour afficher les dates en biais
+  theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+  labs(title = "Nombre d'étoiles en fonction de la date de
+         création des dépôts",
+       x = "Date de création des dépôts",
+       y = "Nombre d'étoile des dépôts",
+       subtitle = "Le nombre d'étoile est représenté par une échelle
+         logarithmique") +
+  custom_theme
+
+# Le lecteur averti aura remarqué que dans cette représentation, nous avons
+# retiré les dépôts ayant moins de 130 étoiles.
+# ces derniers perturbent la représentation graphique en ajoutant une ligne 
+# continue en bas du nuage du point pour les dates de 2009 à 2015
+# ce qui perturbe la représentation graphique.
+# Les retirer n'enlève en rien les conclusion faite sur ce graphique.
+# et participe uniquement au confort de lecture.
+```
+
+L'échelle logarithmique rendant plus difficile l'interprétation du graphique,
+nous avons entouré le dépôt `freeCodeCamp` en rouge. Ce dépôt qui possède le plus
+d'étoile a été crée en 2015 et l'échelle logarithmique le rapproche du reste des
+dépôts dans le représentation graphique.
+
+Ce graphique nous montre très clairement que la date de création du dépôt n'influence en rien la popularité de ces derniers :
+on trouve des dépôts aujourd'hui populaire créés dans les premières années de GitHub (2009-2010), comme des dépôt populaire très récents (2023).
+
+
+On voit bien que la moyenne reste relativement stable. On note une légère hausse
+en 2022 qui peut traduire une hausse de popularité de la plateforme.
+
+Le 25 janvier 2023, GitHub annonçait avoir atteint les [100 millions d'utilisateurs](https://github.blog/2023-01-25-100-million-developers-and-counting/).
+
+On peut donc voir dans notre graphique un début d'une augmentation d’utilisateurs
+actifs sur la plateforme, sans pouvoir le confirmer.
+
+## 2.4 Existe-il un lien entre le nombre d'étoile et le nombre de de `watchers` ?
+
+Comme évoqué dans la présentation du jeu de données, nous disposons d'autres indicateurs
+de "popularité". L'un deux, nommé `watchers` dans le dataset, indique combien de
+personne "suivent" un dépôt.
+
+Si l'on reprend la métaphore d'un réseau social : un utlisateur peu *liker* un dépôt
+qu'il apprécie (ajoute une étoile *stars*) mais il peut également *follow* le dépôt
+pour être mit au courant des évolutions.
+
+On peut supposer qu'un dépôt ayant beaucoup d'étoiles aura aussi beaucoup de *watchers*
+qui souhaitent être informé des évolutions.
+
+On va donc confirmer ou non cette hypothèse à l'aide d'un [scatterplot](https://datavizcatalogue.com/methods/scatterplot.html).
+
+```{r}
+ggplot(df, aes(x = stars, y = watchers)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Nombre d'étoile des dépôts",
+       y = "Nombre de watchers des dépôts",
+       title = "Nuage de point entre les stars et watchers des dépôts") +
+  custom_theme
+```
+
+Tel quel le graphique n'est pas exploitable à cause de la très grandes disparités
+dans les valeurs de `stars` qui vient "tasser" la très
+grande majorité des points dans le coin infénieur gauche ("faibles" valeurs de
+`stars` et faibles valeurs de `watchers`)
+
+On peut commencer par tracer le même graphique en retirant tous les dépôts possédant
+moins de 10000 étoiles.
+
+```{r}
+ggplot() +
+  geom_point(aes(x = df[df$stars <= 10000,]$stars,
+                 y = df[df$stars <= 10000,]$watchers)) +
+  geom_smooth(aes(x = df[df$stars <= 10000,]$stars,
+                 y = df[df$stars <= 10000,]$watchers)) +
+  geom_point(aes(x = df[df$stars <= df$watchers,]$stars,
+                 y = df[df$stars <= df$watchers,]$watchers),
+             color = 'red') +
+  labs(x = "Nombre d'étoile des dépôts",
+       y = "Nombre de watchers des dépôts",
+       title = "Nuage de point entre les stars et watchers des dépôts 
+       pour les dépôts de moins de 10000 étoiles.",
+       subtitle = "En rouge les dépôts avec moins d'étoiles que de watchers") +
+  custom_theme
+```
+
+Contrairement à notre hypothèse de base, il semble que le nombre de `watchers`
+n'évolue que très peu quelque soit le nombre d'étoile attribué au dépôt.
+
+On observe quelque dépôts qui sortent du lot (valeurs abérantes) qui possèdent 
+plus de `watchers` que de `stars` (ce qui va à l'encontre de la très large 
+majorité des dépôts). Nous les avons affiché en rouge sur le précédent graphique.
+
+Si l'on observe les noms de ces dépôts :
+
+```{r}
+# Liste complète
+# df[df$stars <= df$watchers,]$nameWithOwner
+head(df[df$stars <= df$watchers,]$nameWithOwner)
+```
+
+On remarque qu'il s'agit surtout de dépôt publics créés par des grandes entreprises
+comme Microsoft (les produits Azure entre autre), Uber, Netflix, Shopify, etc.
+
+On peut donc supposer que ces dépôt abritent le code source de programmes ré-utilisés
+par de nombreux développeurs (tel que des API ou des SDK : software development kit).
+
+Les entreprises ou développeurs utilisant ces programmes doivent donc souhaiter
+être tenu a jours des évolutions (ce sont des `watchers`) sans pour autant *liker*
+le dépôt (sans prendre le temps de le faire).
+
+On remarque aussi grâce au courbe ajustées au nuages de points que l'on peut donc supposer qu'il existe une relation linéaire entre les deux variables
+du type : $watchers = a \times stars + b$. Avec $a$ proche de 0.
+
+```{r}
+lm(df$watchers~df$stars)$coefficients
+```
+
+Si on ajuste une droite de regression linéaire on obtient une droite du
+type : $watchers = 0.02587 \times stars + 16.11$.
+
+Cette hypothèse de linéarité entre les deux 
+variables doit cependant être traité avec prudence au vu du
+nuage. On peut observer une tendance générale : plus un dépôt à d'étoile, plus
+il a tendance à avoir être suivi et donc avoir plus de `watchers`.
+Certains dépôts font exception à cette règle.
+
+On pourrait pousser l'analyse statistique pour définir la qualité d'adéquation
+d'un modèle linéaire.
+
+Si l'on affiche que les dépôts ayant plus de 10000 étoiles on a :
+
+```{r}
+ggplot(df[df$stars > 10000,],aes(x = stars, y = watchers)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Nombre d'étoile des dépôts",
+       y = "Nombre de watchers des dépôts",
+       title = "Nuage de point entre les stars et watchers des dépôts 
+       pour les dépôts de moins de 10000 étoiles.") +
+  custom_theme
+```
+
+On observe un comportement très similaire (certaines valeurs extrêmes vont
+venir *tasser* les plus petites dans le coin inférieur gauche) et on retrouve une
+relation linéaire.
+
+<!-- # Je mets en comm cette section qui n'est pas essentielle au projet
+
+On peut observer le nuage de point complet en utilisant une échelle logarithmique.
+
+Attention dans ce cas : le graphique affiche une tendance non linéaire (exponentielle)
+pour les grandes valeurs de `stars`. Cependant cet effet est principalement
+dû à l'échelle logarithmique.
+
+La forme prise par le nuage de point est indique bel et bien une relation linéaire
+quand seul l'axe des abscisse est en échelle logarithmique.
+
+On peut donc en conclure qu'il existe bien une relation linéaire entre les deux
+grandeurs, même si on observe une grande variabilité dans les données avec quelques
+exceptions dont le comportement diffère.
+-->
+
+## 2.5 Existe-il un relation entre le nombre d'étoile et le nombre de de `forks` ?
+
+Pour cet jeu de données, un autre attribut important est celui des `forks`, qui
+reflète dans une
+certaine mesure le degré de participation des utilisateurs dans un dépôt GitHub.
+Autrement dit, nous voulons comprendre la corrélation entre la popularité d'un
+projet et la participation.
+
+Il convient de mentionner qu'en ce qui concerne le degré de participation,
+il peut y avoir des
+personnes qui participent directement à la contribution au code, ou il peut y
+avoir des personnes qui se contentent de *fork* un dépôt dans le but d'apprendre.
+
+Pour deux attributs dans un jeu de données, calculer leur coefficient de
+corrélation est un bon
+moyen de trouver la relation entre eux. Ici, nous choisissons le coefficient
+de corrélation de
+Pearson et le coefficient de corrélation de rang de Spearman pour vérifier et
+découvrir la
+relation entre eux.
+
+Les deux coefficients de corrélation prennent des valeurs comprises entre 1 et
+-1, 1 indiquant
+une corrélation élevée et 0 indiquant aucune corrélation. La différence est que
+le coefficient
+de corrélation de Pearson est plus sensible aux relations linéaires et que le
+coefficient de
+corrélation de rang de Spearman est plus sensible aux relations monotones entre
+les variables.
+
+```{r}
+correlation_pearson <- cor(df$stars, df$forks, method = "pearson")
+correlation_spearman <- cor(df$stars, df$forks, method = "spearman")
+print(correlation_pearson)
+print(correlation_spearman)
+```
+Concrètement, ces deux coefficients nous disent :
+
+Coefficient de corrélation de Pearson : 0,5847746, indiquant qu'il existe un certain degré de
+corrélation linéaire entre `stars` et `forks`, mais la corrélation n'est pas très forte et est
+une corrélation modérée. Cela signifie que plus le nombre de `stars` d'un projet augmente, plus
+le nombre de `forks` augmente, et vice versa, mais l'ampleur du changement peut être
+relativement faible.
+
+Coefficient de corrélation de rang de Spearman : 0,6531888, indiquant qu'il existe un certain
+degré de relation monotone entre `stars` et `forks`, mais il n'est pas nécessaire que la
+relation soit linéaire. Ce coefficient est légèrement supérieur au coefficient de corrélation de
+Pearson, ce qui indique que la relation entre `stars` et `forks` a tendance à être davantage une
+tendance monotone croissante, plutôt qu'une relation nécessairement linéaire stricte.
+
+Considérant que le coefficient de corrélation de Pearson est très sensible aux valeurs
+aberrantes, nous essayons d'utiliser un [scatterplot](https://datavizcatalogue.com/methods/scatterplot.html) pour trouver ces valeurs aberrantes.
+
+```{r}
+
+ggplot(df, aes(x = stars, y = forks)) +
+  geom_point() +  
+  geom_smooth(method = "gam", se = FALSE) +  #Puisque nous constatons qu’il n’existe pas nécessairement de relation linéaire entre ces deux attributs, nous utilisons la méthode gam pour l’ajuster.
+  labs(x = "Stars", y = "Forks", title = "Relation entre Stars et Forks") +
+  custom_theme
+```
+
+Nous avons constaté que certains dépôts ont un nombre de `stars` extrêmement faible, mais un
+nombre de `forks` extrêmement élevé. Il s'agit évidemment de valeurs aberrantes.
+
+Nous avons également remarqué que le nombre de `stars` de la plupart des dépôts est inférieur à
+10 000 et le nombre de `forks` est inférieur à 50 000. Afin d'étudier la relation entre le
+nombre d'étoiles et la fourchette, nous devons extraire la majorité des données.
+
+
+```{r}
+ggplot(df[df$stars < 10000 & df$forks < 50000, ], aes(x = stars, y = forks)) +
+  geom_point() +  
+  geom_smooth(method = "gam", se = FALSE) +  
+  labs(title = "Relation entre Stars et Forks") +
+  custom_theme
+
+```
+
+Affiner davantage la portée:
+
+```{r}
+ggplot(df[df$stars < 10000 & df$forks < 10000 , ], aes(x = stars, y = forks)) +
+  geom_point() +  
+  geom_smooth(method = "gam", se = FALSE) +  
+  labs(title = "Relation entre Stars et Forks") +
+  custom_theme
+
+```
+
+Après avoir filtré de nombreuses valeurs aberrantes, nous essayons de recalculer les deux
+coefficients de corrélation et de les comparer avec les résultats du calcul précédent.
+
+```{r}
+
+correlation_pearson_ajuste <- cor(df[df$stars < 10000 & df$forks < 10000 , ]$stars, df[df$stars < 10000 & df$forks < 10000 , ]$forks, method = "pearson")
+correlation_spearman_ajuste <- cor(df[df$stars < 10000 & df$forks < 10000 , ]$stars, df[df$stars < 10000 & df$forks < 10000 , ]$forks, method = "spearman")
+print(correlation_pearson_ajuste)
+print(correlation_spearman_ajuste)
+print(correlation_pearson)
+print(correlation_spearman)
+```
+
+Nous pouvons constater que les deux coefficients de corrélation n’ont pas beaucoup changé.
+
+On peut donc dire qu'après avoir éliminé de nombreuses valeurs aberrantes, le coefficient de
+corrélation entre `stars` et `forks` montre toujours une corrélation positive modérée, ce qui
+montre qu'il existe effectivement un certain degré de corrélation entre elles, mais qu'il n'y a
+pas de relation linéaire évidente. Cette situation peut refléter la complexité et la diversité
+des données, c'est-à-dire que la popularité (`stars`) et la participation (`forks`) des dépôt
+sont affectées par de multiples facteurs et ne peuvent être simplement décrites par un modèle
+linéaire.
+
+Par conséquent, nous pouvons conclure que la relation entre `stars` et `forks` est
+statistiquement modérément positive, mais n'a pas de relation linéaire évidente et peut être
+affectée par divers facteurs. Cette conclusion contribue à une compréhension et une analyse plus
+approfondies de la relation entre la popularité des dépôts et la participation.

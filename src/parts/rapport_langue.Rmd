@@ -1,0 +1,97 @@
+
+### 5. Analyser les tendances des langages de programmation : ***language***
+
+#### 5.1 Attributs de choix lors de l'étude des tendances des langages
+
+Au cœur de l'écosystème numérique, les langages de programmation jouent un rôle crucial dans le développement et l'évolution des logiciels. Comprendre l'évolution de l'utilisation des langages de programmation est essentiel pour saisir les dynamiques de l'industrie informatique, ainsi que pour guider nos propres choix. 
+
+Il existe deux attributs dans notre jue de données qui sont directement liés aux langages de programmation: `languages` et `primaryLanguage`.
+
+Il existe un autre attribut lié au langage de programmation : `createdAt`. Lorsqu'il est observé avec `primaryLanguage`, il peut refléter le premier langage sélectionné lors de la création du projet. Lorsqu'il y a suffisamment d'échantillons, les langages de programmation populaires de chaque période peuvent être vus.
+
+Car d’autres attributs, tels que `stars`, `forks` et `watchers`, peuvent refléter dans une certaine mesure la popularité de la langue.
+
+#### 5.2 Popularité du langage de programmation
+
+Puisque certains référentiels n'indiquent pas le langage de programmation, nous ne considérerons pas ces référentiels:
+
+```{r}
+df_filtered <- df[df$languageCount > 0 , ]
+```
+
+Regroupez les données en fonction des attributs du langage de programmation et calculez la somme des étoiles, des forks et des observateurs pour chaque langage:
+
+```{r}
+language_pop <- df_filtered %>%
+  group_by(primaryLanguage) %>%
+  summarise(sum_stars = sum(stars),
+            sum_forks = sum(forks),
+            sum_watchers = sum(watchers))
+```
+
+Nous pouvons utiliser un nuage de points pour découvrir la distribution de popularité d'une langue en fonction des trois attributs `stars`, `forks` et `watchers`. Nous traçons le nombre total de `stars` sur l'axe des x, le nombre total de `forks` sur l'axe des y et le nombre total de `watchers` sur la taille en points:
+
+```{r}
+
+ggplot(data = language_pop[language_pop$sum_stars > 1000000,], aes(x = sum_stars, y = sum_forks, size = sum_watchers)) +
+  geom_point(aes(color = primaryLanguage), show.legend = FALSE) +  
+  geom_text(aes(label = primaryLanguage), size = 3, vjust = -0.5) +  
+  scale_size_continuous(name = "Watchers", range = c(1, 10)) +
+  labs(x = "Sum Stars", y = "Sum Forks", title = "Distribution de la popularité du langage de programmation GitHub") +
+  theme_minimal()
+
+```
+
+Nous pouvons diviser tous les langages de programmation en quatre niveaux selon le schéma :
+
+- *T0：* Python, JavaScript
+- *T1：* Java
+- *T2：* C++, TypeScript, Go, C(peut-être)
+- *T3：* Les autres langues
+
+#### 5.3 Tendances dans les langages de programmation grand public
+
+Après avoir vu les résultats ci-dessus, nous ne pouvons nous empêcher de nous demander quand Python et JavaScript sont-ils devenus si populaires ? Nous devons découvrir les tendances de ces langages de programmation.
+
+Mais avant cela, nous devons traiter spécialement notre ensemble de données：
+
+
+```{r}
+
+# Convertir CreateAt au format de date et extraire l'année
+df_filtered <- df_filtered %>%
+  mutate(year = lubridate::year(as.Date(createdAt)))
+
+# Regroupés par année et langage de programmation, comptez le nombre d'entrepôts dans chaque langue par an
+language_count <- df_filtered %>%
+  group_by(year, primaryLanguage) %>%
+  summarise(count = n()) %>%
+  ungroup()
+
+# Calculer le nombre cumulé de chaque langue par an
+language_count <- language_count %>%
+  group_by(primaryLanguage) %>%
+  mutate(cumulative_count = cumsum(count)) %>%
+  ungroup()
+
+
+# Filtrer les dix principales langues
+top_languages <- language_count %>%
+  group_by(primaryLanguage) %>%
+  summarise(total_count = sum(count)) %>%
+  top_n(10, total_count) %>%
+  pull(primaryLanguage)
+
+
+```
+
+```{r}
+# Dessiner un graphique linéaire
+ggplot(language_count %>% filter(primaryLanguage %in% top_languages), aes(x = year, y = cumulative_count, color = primaryLanguage)) +
+  geom_line() +
+  geom_text(data = language_count %>% filter(primaryLanguage %in% top_languages) %>% group_by(primaryLanguage) %>% filter(year == max(year)), aes(label = primaryLanguage), vjust = -0.5, nudge_y = 1000, check_overlap = TRUE) +
+  labs(x = "Year", y = "Nombre cumulé", title = "Nombre cumulé annuel de langues principales dans les 200 000 premiers référentiels classés par nombre d'étoiles") +
+  theme_minimal()
+```
+
+Sur la figure, nous pouvons voir que python et JavaScript étaient les premiers langages de nombreux entrepôts au début, mais leur utilisation a considérablement augmenté vers 2016 et est finalement devenue le taux d'utilisation de ces deux langages que nous voyons maintenant.
