@@ -54,7 +54,7 @@ La plateforme propose une offre gratuite performante permettant à n'importe que
 
 Ainsi, il est possible de retrouver sur GitHub le code de grandes compagnies comme [*Google*](https://github.com/google) ou [*Microsoft*](https://github.com/microsoft/).
 
-*GitHub*, les utilisateurs créent des **dépôts** (en anglais *repositories* ou *repo* pour la version courte) qui accueillent l'ensemble des fichiers d'un programme, un logiciel, etc.
+Sur *GitHub*, les utilisateurs créent des **dépôts** (en anglais *repositories* ou *repo* pour la version courte) qui accueillent l'ensemble des fichiers d'un programme, un logiciel, etc.
 
 Le 8 novembre dernier, l'entreprise *GitHub* déclarait alors près de 420 millions de projets présents sur la plateforme, dont 284 millions publics.
 
@@ -78,7 +78,7 @@ Nous pourrons sans problème ajouter des données durant notre analyse si nous e
 
 Nous n'excluons pas non plus de recourir à l'API de GitHub pour augmenter les données pour améliorer l'analyse.
 
-Afin de résoudre le problème des fichiers json trop lourd, nous avons décidé d'exécuter le code python suivant dans un notebook de sur Kaggle pour exporter les données par sections en format de CSV:
+Afin de résoudre le problème des fichiers json trop lourd, nous avons décidé d'exécuter le code python suivant dans un notebook sur Kaggle pour exporter les données par sections en format de CSV:
 
 ```         
 import pandas as pd
@@ -218,7 +218,7 @@ Quand un utilisateur *fork* un dépôt, il en crée une copie personnelle sur la
 
 Le nombre de clonage peut être un indicateur supplémentaire de popularité et on peut chercher à savoir si cet indicateur est corrélé au nombre d'étoile d'un projet.
 
-Le paramètre *watchers* est une donnée supplémentaire d'analyse de "popularité". Quand on utilisateur *watchs* (que l'on peut traduire par surveiller ou suivre, en français) un projet, il est averti quand ce dernier subit une modification.
+Le paramètre *watchers* est une donnée supplémentaire d'analyse de "popularité". Quand un utilisateur *watchs* (que l'on peut traduire par surveiller ou suivre, en français) un projet, il est averti quand ce dernier subit une modification.
 
 Là encore, on pourra chercher à vérifier l’existence d'une corrélation entre le nombre d'étoile, le nombre de clone, et le nombre de suivi des dépôts.
 
@@ -349,7 +349,7 @@ Sur GitHub, les étoiles jouent un rôle similaire à celui des *likes* sur les
 réseaux-sociaux classiques. Ainsi, on peut partir du postulat que nous disposons
 d'informations relatives aux ***repo*** les plus "populaires" de GitHub.
 
-Cette les raisons qui peuvent pousser un utilisateur à *liker* un dépôt sont nombreuses :
+Les raisons qui peuvent pousser un utilisateur à *liker* un dépôt sont nombreuses :
 conserver le projet dans son historique personnel pour y revenir plus tard,
 signifier que l'on apprécie ce dépôt, etc.
 
@@ -375,7 +375,7 @@ les dépôts ayant le plus d'étoiles.
 
 Nous travaillons donc sur les 200000 projets ayant le plus d'étoiles sur GitHub.
 
-Pour simplifier le travail, je propose de trier le dataset par en fonction du
+Pour simplifier le travail, je propose de trier le dataset en fonction du
 nombre d'étoile dans l'ordre décroisant
 
 ```{r}
@@ -1038,7 +1038,6 @@ corrélation de rang de Spearman est plus sensible aux relations monotones entre
 les variables.
 
 ```{r}
-
 correlation_pearson <- cor(df$stars, df$forks, method = "pearson")
 correlation_spearman <- cor(df$stars, df$forks, method = "spearman")
 print(correlation_pearson)
