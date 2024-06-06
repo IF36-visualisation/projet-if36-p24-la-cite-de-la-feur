@@ -6,7 +6,7 @@ library(stringr)
 
 # charger les données
 rm(list=ls())
-df <- df <- read_csv("../../data/data_1_200000_noDuplicates.csv")
+df <- read_csv("../../data/data_1_200000_noDuplicates.csv")
 
 # exemple pour retirer les langages du premier dépôt
 # text <- df$languages[1]

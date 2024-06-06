@@ -68,6 +68,81 @@ l'ordre par Java, TypeScript et C++ etc. On peut grossièrement le diviser en
 quatre niveaux selon la fréquence d’utilisation: Python et JavaScript sont les 
 plus courants, suivis de Java. TypeScript, C++, Go et C troisième et les autres.
 
+<!-- Ajout du nuage de mots -->
+
+Une autre manière de représenter ces résultats est d'utiliser un graphique en
+nuage de mots : *cloud word*.
+
+```{r}
+# charge les librairies utiles pour le graphique en nuage de mots
+library(wordcloud)
+library(RColorBrewer)
+library(stringr)
+library(ggwordcloud)
+```
+```{r}
+# Pour tracer ce graphique, j'utilise la variable nommée languages de notre
+# dataset qui est une chaine de charactère en format json qu'il faut traiter au
+# préalable avec une opération de regex.
+# Appliqué à tous les dépôts
+text <- df$languages
+pattern <- "'name': '[^']+" # Mon patern regex utilisé
+matching <- str_extract_all(text, pattern)
+langages <- mapply(matching,
+				   FUN = substr,
+				   start = 10,
+				   stop = 1000)
+
+# Convertir en une unique liste qui liste la fréquence d'appartion du langage
+# dans les dépôts
+langagesVec <- unlist(langages)
+word_freqs <- table(langagesVec) %>% as.data.frame()
+colnames(word_freqs) <- c("word", "freq")
+```
+
+```{r}
+set.seed(1234) # for reproducibility
+# windows()
+wordcloud(
+	words = word_freqs$word,
+	freq = word_freqs$freq,
+	min.freq = 1,
+	max.words=200,
+	random.order=FALSE,
+	color=brewer.pal(8, "Dark2"),
+	random.color = TRUE,
+	fixed.asp = TRUE
+)
+```
+
+Ce type de visualisation permet de rendre compte d'une impression, d'un
+ordre de grandeur: certain langages
+sont bien plus représentés que d'autres.
+Cette représentation est très jolie et agréable à regarder et conviendrait parfaitement
+à une utilisation à visée marketing ou de communication.
+Par exemple, GitHub pourrait parfaitement utiliser ce type de visuel sans ses
+billets de blog annuels sur les grandes tendances du site.
+
+Cependant, cette représentation n'est pas plus utile dans le cadre d'une analyse plus
+précise car elle ne permet pas de comparer les langages entre eux (difficile de
+dicerner qui de `Python` ou `Shell` est le plus grand dans le nuage de mots).
+
+Cette représentation ne traitant pas sur les mêmes données (`languages` et non
+`primaryLanguage`), on remarque que de nouveaux langages apparaissent comme très
+utilisés : `Shell`, `HTML`, `CSS`, `Makefile`, `Dockerfile`.
+
+Ces langages sont souvent utilisés en support :
+- `HTML` et `CSS` pour gérer des interfaces graphiques.
+- `Shell` est le langage d'intepréteur de commande des systèmes d'exploitations Unix et
+type Unix comme Linux.
+- `Makefile` est utilisé pour configurer les étapes de compilation notament pour le langage
+`C` et `C++`
+
+Ces langages sont donc souvent présents dans les dépôts mais ne constituent jamais
+le coeur des projets et ne sont donc pas représentés à travers l'attribut
+`primaryLanguage`.
+
+
 Après avoir examiné la fréquence d'utilisation des principaux langages de programmation 
 dans les dépôts GitHub, nous souhaitons désormais explorer plus en profondeur la 
 popularité de ces langages en fonction de différents indicateurs. Pour ce faire, 
