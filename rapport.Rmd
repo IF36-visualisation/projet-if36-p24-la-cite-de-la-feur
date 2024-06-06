@@ -40,3 +40,5 @@ Langue : Français
 ```{r child="./src/parts/1-mesureDeLaPopularite.Rmd"}
 ```
 
+```{r child="./src/parts/2-etudeDesLangues.Rmd.Rmd"}
+```

@@ -1,0 +1,287 @@
+# 3. Deuxième étude :Étude des langages de programmation utilisés: ***language***
+
+## 3.1 Notre interprétation du langages de programmation
+
+Au cœur de l'écosystème numérique, les langages de programmation jouent 
+un rôle crucial dans le développement et l'évolution des logiciels. Comprendre 
+l'évolution de l'utilisation des langages de programmation est essentiel pour 
+saisir les dynamiques de l'industrie informatique, ainsi que pour guider nos 
+propres choix. 
+
+Il existe deux attributs dans notre jue de données qui sont directement liés 
+aux langages de programmation: `languages` et `primaryLanguage`.
+
+Il existe un autre attribut lié au langage de programmation : `createdAt`. 
+Lorsqu'il est observé avec `primaryLanguage`, il peut refléter le premier 
+langage sélectionné lors de la création du projet. Lorsqu'il y a suffisamment 
+d'échantillons, les langages de programmation populaires de chaque période peuvent être vus.
+
+Car d’autres attributs, tels que `stars`, `forks` et `watchers`, peuvent refléter 
+dans une certaine mesure la popularité de la langue.
+
+
+
+## 3.2 Popularité du langage de programmation
+
+Puisque certains référentiels n'indiquent pas le langage de programmation, 
+nous ne considérerons pas ces référentiels:
+
+```{r}
+df_filtered <- df[df$languageCount > 0 , ]
+```
+
+Nous pouvons simplement compter la fréquence d'apparition des langages de 
+programmation principaux parmi les 20 000 premiers dépôts pour explorer la 
+popularité des langages de programmation.
+
+Nous pouvons utiliser un diagramme à barres pour découvrir la distribution 
+des langages de programmation principaux dans les dépôts GitHub. Nous traçons 
+la fréquence d'utilisation des principaux langages sur l'axe des y et les 
+différents langages sur l'axe des x. Chaque barre représente un langage de 
+programmation, et la hauteur de la barre correspond à sa fréquence d'utilisation.
+
+Ce choix de graphique est pertinent car il permet de visualiser de manière 
+claire et directe les différences de popularité entre les langages. Le diagramme 
+à barres facilite la comparaison visuelle des fréquences, ce qui est essentiel 
+pour identifier rapidement les langages les plus et les moins utilisés. De plus, 
+sa simplicité rend les résultats facilement compréhensibles pour un large public.
+
+```{r}
+language_distribution <- df_filtered %>%
+  group_by(primaryLanguage) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+ggplot(language_distribution[language_distribution$count>5000,], aes(x = 
+reorder(primaryLanguage, -count), y = count)) +
+  geom_bar(stat = "identity") +
+  
+  labs(title = "Distribution de la popularité du langage de programmation GitHub",
+       x = "Langage de programmation",
+       y = "Fréquence") +
+  custom_theme
+
+
+```
+
+On constate que le principal langage de programmation qui apparaît le plus 
+fréquemment dans ces 20 000 dépôts GitHub est Python et JavaScript, suivi dans 
+l'ordre par Java, TypeScript et C++ etc. On peut grossièrement le diviser en 
+quatre niveaux selon la fréquence d’utilisation: Python et JavaScript sont les 
+plus courants, suivis de Java. TypeScript, C++, Go et C troisième et les autres.
+
+
+Après avoir examiné la fréquence d'utilisation des principaux langages de programmation 
+dans les dépôts GitHub, nous souhaitons désormais explorer plus en profondeur la 
+popularité de ces langages en fonction de différents indicateurs. Pour ce faire, 
+nous allons analyser la distribution de popularité des langages de programmation en 
+utilisant un nuage de points.
+
+Nous allons traquer trois mesures clés de la popularité des dépôts :
+
+- Le nombre total de `stars`, qui reflète l'appréciation générale de la communauté.
+- Le nombre total de `forks`, qui indique l'intérêt des développeurs pour collaborer ou créer des variantes du projet.
+- Le nombre total de `watchers`, qui montre le niveau d'intérêt et de suivi des développeurs pour les mises à jour du projet.
+
+Le nuage de points est un outil efficace pour cette analyse, car il permet de visualiser 
+simultanément ces trois dimensions. L'axe des x représentera le nombre total de `stars`, 
+l'axe des y le nombre total de `forks`, et la taille des points reflétera le nombre total 
+de `watchers`. Cette représentation graphique nous aidera à identifier les tendances et 
+les relations entre ces indicateurs de popularité pour chaque langage de programmation.
+
+
+
+```{r}
+#On regroupe les données en fonction des attributs du langage de programmation et calcule 
+la somme des `stars`, des `forks` et des `watchers` pour chaque langage:
+
+language_pop <- df_filtered %>%
+  group_by(primaryLanguage) %>%
+  summarise(sum_stars = sum(stars),
+            sum_forks = sum(forks),
+            sum_watchers = sum(watchers))
+```
+
+
+
+```{r}
+
+ggplot(data = language_pop[language_pop$sum_stars > 1000000,], aes(x = sum_stars, 
+y = sum_forks, size = sum_watchers)) +
+  geom_point(aes(color = primaryLanguage), show.legend = FALSE) +  
+  geom_text(aes(label = primaryLanguage), size = 3, vjust = -0.5) +  
+  scale_size_continuous(name = "Watchers", range = c(1, 10)) +
+  labs(x = "Sum Stars", y = "Sum Forks", title = "Distribution de la popularité du 
+  langage de programmation GitHub") +
+  custom_theme
+
+```
+
+Nous pouvons diviser tous les langages de programmation en quatre niveaux selon le schéma :
+
+- *T0:* Python, JavaScript
+- *T1:* Java
+- *T2:* C++, TypeScript, Go, C(peut-être)
+- *T3:* Les autres langues
+
+La classification en niveaux confirme et enrichit les résultats obtenus avec le diagramme à barres :
+
+- *Consistance des Tendances:* Le diagramme à barres montrait déjà que Python et JavaScript sont les langages les plus fréquemment utilisés. La conclusion obtenue à partir du nuage de points est exactement la même que la conclusion que nous avons obtenue à partir de l'histogramme auparavant. Le nuage de points a confirmé leur suprématie en termes d'étoiles, de forks, et de watchers.
+- *Détection des Outliers:* On a observé que, bien que Python soit utilisé plus fréquemment que JavaScript dans les dépôts GitHub, il obtient moins de stars, forks et watchers par rapport à JavaScript. Cela pourrait être dû à la nature plus visible et collaborative des projets JavaScript, ainsi qu'à l'accent mis par la communauté sur les contributions open source. Python, malgré sa fréquence d'utilisation élevée, peut inclure de nombreux projets spécialisés ou utilitaires qui ne génèrent pas autant d'engagement visible.
+- *Distribution Équilibrée:* Les niveaux T2 et T3 montrent une distribution plus équilibrée sans dominance excessive, ce qui indique une adoption répartie selon les cas d'usage spécifiques des langages.
+
+## 3.3 Tendances dans les langages de programmation grand public
+
+Après avoir vu les résultats ci-dessus, nous ne pouvons nous empêcher de nous demander 
+quand Python et JavaScript sont-ils devenus si populaires? Nous devons découvrir les 
+tendances de ces langages de programmation.
+
+Mais avant cela, nous devons traiter spécialement notre ensemble de données：
+
+
+```{r}
+
+# Convertir CreateAt au format de date et extraire l'année
+df_filtered <- df_filtered %>%
+  mutate(year = lubridate::year(as.Date(createdAt)))
+
+# Regroupés par année et langage de programmation, comptez le nombre d'entrepôts dans chaque langue par an
+language_count <- df_filtered %>%
+  group_by(year, primaryLanguage) %>%
+  summarise(count = n()) %>%
+  ungroup()
+
+# Calculer le nombre cumulé de chaque langue par an
+language_count <- language_count %>%
+  group_by(primaryLanguage) %>%
+  mutate(cumulative_count = cumsum(count)) %>%
+  ungroup()
+
+
+# Filtrer les dix principales langues
+top_languages <- language_count %>%
+  group_by(primaryLanguage) %>%
+  summarise(total_count = sum(count)) %>%
+  top_n(10, total_count) %>%
+  pull(primaryLanguage)
+
+
+```
+
+```{r}
+# Dessiner un graphique linéaire
+ggplot(language_count %>% filter(primaryLanguage %in% top_languages), aes(x = year, 
+y = cumulative_count, color = primaryLanguage)) +
+  geom_line() +
+  geom_text(data = language_count %>% filter(primaryLanguage %in% top_languages) %>% 
+    group_by(primaryLanguage) %>% filter(year == max(year)), aes(label = primaryLanguage), 
+    vjust = -0.5, nudge_y = 1000, check_overlap = TRUE) +
+  labs(x = "Year", y = "Nombre cumulé", title = "Nombre cumulé annuel de langues 
+    principales dans les 200 000 premiers référentiels classés par nombre d'étoiles") +
+  custom_theme
+```
+
+Sur la figure, nous pouvons voir que python et JavaScript étaient les premiers langages 
+de nombreux entrepôts au début, mais leur utilisation a considérablement augmenté vers 
+2016 et est finalement devenue le taux d'utilisation de ces deux langages que nous voyons 
+maintenant.
+
+## 3.4 Analyse des langages de programmation et des métriques des dépôts
+
+La popularité d'un langage peut être mesurée de diverses manières, telles que le nombre 
+de dépôts utilisant ce langage, le nombre de contributeurs actifs, ou encore le nombre de 
+téléchargements de bibliothèques associées, il est tout aussi important de comprendre 
+comment cette popularité se traduit concrètement dans les caractéristiques et les métriques 
+des dépôts GitHub.
+
+Dans cette étude, nous nous penchons sur la relation entre la popularité des langages 
+de programmation et les métriques des dépôts GitHub. Plus précisément, nous cherchons 
+à comprendre si les langages les plus populaires sont associés à des dépôts de taille 
+et de complexité plus importantes, ou si d'autres facteurs entrent en jeu. Pour ce faire, 
+nous analysons plusieurs métriques clés, notamment l'utilisation moyenne du disque (`diskUsageKb`), 
+le nombre moyen de `pullRequests`, et le nombre moyen d'`issues`, en fonction des langages 
+de programmation utilisés dans les dépôts GitHub. Cette analyse nous permettra de mieux 
+comprendre comment la popularité des langages de programmation se manifeste dans les 
+caractéristiques des dépôts.
+
+### 3.4.1 Comparaison de l'utilisation du disque par langage de programmation
+
+```{r}
+# Calculer l'utilisation moyenne du disque par langage de programmation
+utilisation_disque <- df_filtered %>%
+  group_by(primaryLanguage) %>%
+  summarise(utilisation_moyenne_disque = mean(diskUsageKb, na.rm = TRUE),count = n()) %>%
+  arrange(desc(count))
+
+# Créer un graphique à barres
+ggplot(utilisation_disque[utilisation_disque$count>5000,], aes(x = 
+  reorder(primaryLanguage,-count) , y = utilisation_moyenne_disque)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Utilisation moyenne du disque par langage de programmation",
+       x = "Langage de programmation populaire",
+       y = "Utilisation moyenne du disque (Ko)") +
+  custom_theme
+
+```
+Nous avons constaté que parmi les langages de programmation les plus populaires, C, 
+C++ et C#, langages efficaces mais complexes, utilisent un espace disque moyen plus élevé.
+
+Nous avons les spéculations suivantes sur ce résultat:
+
+- *Nature des projets:* Ces langages sont souvent choisis pour des projets complexes et de grande envergure, tels que les systèmes d'exploitation, les moteurs de jeux et les logiciels d'entreprise, qui nécessitent l'utilisation de nombreuses bibliothèques et de ressources supplémentaires.
+- *Exigences de performances et d'efficacité:* Les langages de bas niveau comme C et C++ sont privilégiés pour leur efficacité et leur contrôle direct sur le matériel, ce qui peut entraîner l'utilisation de ressources supplémentaires pour l'optimisation du code et la gestion de la mémoire.
+- *Complexité des projets:* La gestion de la mémoire, la manipulation des pointeurs et l'intégration avec des bibliothèques externes peuvent rendre les projets dans ces langages plus complexes, ce qui se traduit par une augmentation de la taille des fichiers et donc de l'utilisation du disque.
+- *Priorités de performance:* Dans certains cas, les performances peuvent être prioritaires par rapport à l'optimisation de l'utilisation de l'espace disque, ce qui peut entraîner une augmentation de la taille du binaire final pour garantir une exécution rapide et efficace.
+
+En conclusion, l'observation que les langages de programmation comme C, C++ et C# 
+ont des taux d'utilisation de disque plus élevés met en lumière la complexité et les 
+exigences spécifiques des projets développés dans ces langages, ainsi que les compromis 
+nécessaires entre performances, efficacité et utilisation des ressources. De plus, de 
+nombreux outils et bibliothèques populaires utilisés dans des langages plus haut niveau 
+comme Python sont eux-mêmes écrits en C, C++ ou C#, ce qui signifie que même les projets 
+développés dans des langages plus accessibles peuvent dépendre de ces langages de bas niveau 
+pour leur fonctionnement interne.
+
+### 3.4.2 Analyse des pull requests et des issues par langage de programmation
+
+Les pull requests et les issues sont des indicateurs cruciaux de l'activité et de la 
+collaboration au sein d'un projet logiciel. Les pull requests représentent les propositions 
+de modification du code source, tandis que les issues correspondent aux problèmes ou aux 
+demandes d'amélioration signalés par les utilisateurs ou les contributeurs. Ces deux métriques 
+sont essentielles pour évaluer la santé et la dynamique d'un projet, ainsi que pour mesurer 
+l'engagement de la communauté de développeurs.
+
+
+```{r}
+# Calculer le nombre moyen de pull requests et d'issues par langage de programmation
+pr_issues <- df_filtered %>%
+  group_by(primaryLanguage) %>%
+  summarise(nombre_moyen_pull_requests = mean(pullRequests, na.rm = TRUE),
+            nombre_moyen_issues = mean(issues, na.rm = TRUE),count = n()) %>%
+  arrange(desc(count))
+
+# Créer un graphique à barres groupées
+ggplot(pr_issues[pr_issues$count>5000,], aes(x = reorder(primaryLanguage,-count))) +
+  geom_bar(aes(y = nombre_moyen_pull_requests), fill = "lightgreen", position = "dodge", stat = "identity") +
+  geom_bar(aes(y = nombre_moyen_issues), fill = "orange", position = "dodge", stat = "identity") +
+  labs(title = "Nombre moyen de pull requests et d'issues par langage de programmation",
+       x = "Langage de programmation",
+       y = "Nombre moyen") +
+  scale_fill_manual(values = c("lightgreen", "orange"), name = "Métrique",
+                    labels = c("Pull Requests", "Issues")) +
+  custom_theme
+
+```
+
+La constatation que TypeScript et Go reçoivent le plus grand nombre de pull requests, 
+tandis que TypeScript et C++ ont le plus grand nombre d'issues, souligne les tendances 
+distinctes dans ces langages et leurs communautés respectives. TypeScript, un langage 
+en croissance rapide utilisé principalement dans le développement web, attire un grand 
+nombre de contributions de la part des développeurs, ce qui se traduit par un nombre élevé 
+de pull requests. Cependant, cela peut également conduire à davantage de questions 
+techniques et de problèmes, comme indiqué par le nombre élevé d'issues. D'autre part, 
+bien que C++ soit utilisé dans des domaines variés tels que les jeux et la programmation 
+système, ce qui peut générer un grand nombre d'issues, il reçoit moins de contributions 
+sous forme de pull requests. Cette dichotomie entre les langages reflète les différences 
+dans leurs écosystèmes, leurs applications et l'engagement de leurs communautés respectives 
+dans le développement et la résolution de problèmes.
