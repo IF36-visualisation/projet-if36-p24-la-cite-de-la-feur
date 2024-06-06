@@ -19,8 +19,6 @@ d'échantillons, les langages de programmation populaires de chaque période peu
 Car d’autres attributs, tels que `stars`, `forks` et `watchers`, peuvent refléter 
 dans une certaine mesure la popularité de la langue.
 
-
-
 ## 3.2 Popularité du langage de programmation
 
 Puisque certains référentiels n'indiquent pas le langage de programmation, 
@@ -70,7 +68,6 @@ l'ordre par Java, TypeScript et C++ etc. On peut grossièrement le diviser en
 quatre niveaux selon la fréquence d’utilisation: Python et JavaScript sont les 
 plus courants, suivis de Java. TypeScript, C++, Go et C troisième et les autres.
 
-
 Après avoir examiné la fréquence d'utilisation des principaux langages de programmation 
 dans les dépôts GitHub, nous souhaitons désormais explorer plus en profondeur la 
 popularité de ces langages en fonction de différents indicateurs. Pour ce faire, 
@@ -93,7 +90,7 @@ les relations entre ces indicateurs de popularité pour chaque langage de progra
 
 ```{r}
 #On regroupe les données en fonction des attributs du langage de programmation et calcule 
-la somme des `stars`, des `forks` et des `watchers` pour chaque langage:
+# la somme des `stars`, des `forks` et des `watchers` pour chaque langage:
 
 language_pop <- df_filtered %>%
   group_by(primaryLanguage) %>%
