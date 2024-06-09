@@ -42,3 +42,6 @@ Langue : Français
 
 ```{r child="./src/parts/2-etudeDesLangues.Rmd.Rmd"}
 ```
+
+```{r child="./src/parts/2-etudeDesContributeurs.Rmd"}
+```

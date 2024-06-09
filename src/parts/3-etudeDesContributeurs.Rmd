@@ -1,0 +1,62 @@
+# 4. Troisième étude : Étude des contributeurs
+
+## 4.1 Analyse des contributeurs
+
+Une autre mesure importante pour évaluer la vitalité d'un dépôt est le nombre de contributeurs. Plus un projet a de contributeurs, plus il est probable qu'il soit actif et qu'il bénéficie d'un développement continu. Nous utilisons un dataset de 600 lignes, augmenté en utilisant un script et l'API de GitHub. En réalité nous n'ajoutons que le nombre de contributeurs.
+
+## 4.2 Relation entre le nombre de contributeurs et le nombre d'étoiles 
+
+
+```{r}
+d1 <- read_csv("../../data/githubContrib/data_1.csv")
+d2 <- read_csv("../../data/githubContrib/data_2.csv")
+
+df <- bind_rows(d1, d2) %>% filter(!is.na(contributors))
+
+```
+
+```{r}
+ggplot(df, aes(x = stars, y = contributors)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  labs(x = "Nombre d'étoiles des dépôts",
+       y = "Nombre de contributeurs des dépôts",
+       title = "Relation entre les étoiles et les contributeurs des dépôts") +
+  custom_theme
+
+```
+Ce graphique présente la relation entre le nombre d'étoiles et le nombre de contributeurs des dépôts. Nous observons une tendance générale montrant que les dépôts avec un plus grand nombre d'étoiles ont tendance à avoir également plus de contributeurs. Cependant l'augmentation n'est pas linéaire, et les dépôt n'ayant pas encore eu une grande popularité n'ont pas beaucoup de contributeurs. Le nombre de contributeurs semble même se stabiliser. Il semblerait donc, que ce sont les contributeurs qui amènent à une plus grande popularité.
+
+
+## 4.3 Distribution du nombre de contributeurs des dépôts
+
+```{r}
+ggplot(df, aes(x = contributors)) +
+  geom_histogram(binwidth = 1) +
+  labs(x = "Nombre de contributeurs des dépôts",
+       y = "Fréquence",
+       title = "Distribution du nombre de contributeurs des dépôts")
+```
+Ce graphique montre la distribution du nombre de contributeurs des dépôts. La plupart des dépôts ont un nombre relativement faible de contributeurs, tandis que quelques-uns ont un nombre élevé de contributeurs.
+
+
+## 4.4 Nombre moyen de contributeurs par catégorie d'étoiles
+
+```{r}
+df_summary <- df %>%
+  mutate(stars_category = cut(stars, breaks = c(0, 100, 500, 1000, 2000, 3000, 5000, 10000, 15000, 30000, 50000, 75000, 100000, 125000, 150000, 200000, 300000, Inf), 
+                              labels = c("0-100", "101-500", "501-1000", "1001-2000", "2001-3000", "3001-5000", "5001-10000", "10001-15000", "15001-30000", "30001-50000", "50001-75000", "75001-100000", "100001-125000", "125001-150000", "150001-200000", "200001-300000", ">300000"))) %>%
+  group_by(stars_category) %>%
+  summarize(mean_contributors = mean(contributors))
+
+ggplot(df_summary, aes(x = stars_category, y = mean_contributors)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(x = "Catégorie de nombre d'étoiles des dépôts",
+       y = "Nombre moyen de contributeurs",
+       title = "Nombre moyen de contributeurs par catégorie d'étoiles") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+Ce graphique montre le nombre moyen de contributeurs par catégorie de nombre d'étoiles des dépôts. Il nous permet de voir comment le nombre moyen de contributeurs varie en fonction du nombre d'étoiles reçues par un dépôt. Les dépôt les plus populaire ont plus de contributeurs mais ce n'est pas proportionel au nombre d'étoiles. Il semblerait qu'il existe un seuil de popularité à partir duquel le nombre de contributeurs augmente.
