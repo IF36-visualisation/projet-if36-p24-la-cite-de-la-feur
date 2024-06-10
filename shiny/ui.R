@@ -34,6 +34,12 @@ ui <- dashboardPage(
 				tabName = "repartitionStars",
 				icon = icon("th")
 			),
+			# Onglet Répartition des langues
+			menuItem(
+			  "Répartition des langues",
+			  tabName = "repartitionLangues",
+			  icon = icon("th")
+			),
 			selected = "presentData"
 		)
 	),
@@ -61,7 +67,7 @@ ui <- dashboardPage(
 							  github-repository-metadata-with-5-stars/data"),
 							")."
 						)),
-					p(em("Créateurs du Dashbord : Baptiste Toussaint, "))
+					p(em("Créateurs du Dashbord : Baptiste Toussaint, Shilun XU"))
 				),
 				
 				# Body de l'onglet
@@ -121,6 +127,36 @@ ui <- dashboardPage(
 				  "Quel que soit la partie de nos données que l'on souhaite observer,
 				  on retrouve une structure similaire, avec la majorité des dépôts
 				  sur le début de notre intervalle d'observation.")
+			)
+			,
+			
+			# Onglet Répartition des langues
+			tabItem(
+			  tabName = "repartitionLangues",
+			  h1("Graphiques montrant la répartition et la tendance des langues sur les dépôts"),
+			  fluidRow(
+			    box(
+			      h2("La répartition des langues"),
+			      plotOutput("etudeLangues_languesPlotDistribution"),
+			      sliderInput("etudeLangues_sliderSelection1",
+			                  "Fréquence:",
+			                  min = 0,
+			                  max = 40000,
+			                  value = c(5000,40000))
+			    ),
+			    box(
+			      h2("La tendance des langues"),
+			      plotOutput("etudeLangues_languesPlotTendance"),
+			      sliderInput("etudeLangues_sliderSelection2",
+			                  "Année entre:",
+			                  min = 2009,
+			                  max = 2024,
+			                  value = c(2009,2024))
+			    )
+			  ),
+			  h2("Explications"),
+			  p("Nous pouvons filtrer un ou plusieurs langages de programmation que nous souhaitons étudier en fonction du tableau de distribution et visualiser les tendances changeantes des langages de programmation sélectionnés sur une période de temps.",br(),
+			    "Sur la figure, nous pouvons voir que python et JavaScript étaient les premiers langages de nombreux entrepôts au début, mais leur utilisation a considérablement augmenté vers 2016 et est finalement devenue le taux d'utilisation de ces deux langages que nous voyons maintenant.")
 			)
 		)
 	)

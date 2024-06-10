@@ -11,6 +11,18 @@ server <- function(input, output) {
 	nbrRepository <- dim(df)[1]
 	nbrAttributes <- dim(df)[2]
 	
+	df_filtered <- df[df$languageCount > 0 , ]
+	
+	# Convertir CreateAt au format de date et extraire l'année
+	df_filtered <- df_filtered %>%
+	  mutate(year = lubridate::year(as.Date(createdAt)))
+	
+	
+	language_distribution <- df_filtered %>%
+	  group_by(primaryLanguage) %>%
+	  summarise(count = n()) %>%
+	  arrange(desc(count))
+	
 	custom_theme <- theme(
 		panel.background = element_rect(fill = "#D9E8F1",
 										colour = "#6D9EC1",
@@ -124,5 +136,48 @@ server <- function(input, output) {
 			) +
 			custom_theme
 	})
-
+	
+	###########################################################################
+	# Page n°3 : Répartition des langues
+	###########################################################################~
+	output$etudeLangues_languesPlotDistribution <- renderPlot({
+	  
+	  
+	  ggplot(language_distribution[language_distribution$count >= input$etudeLangues_sliderSelection1[1] & language_distribution$count <= input$etudeLangues_sliderSelection1[2],], aes(x = reorder(primaryLanguage, -count), y = count)) +
+	    geom_bar(stat = "identity") +
+	    
+	    labs(title = "Distribution de la popularité du langage de programmation GitHub",
+	         x = "Langage de programmation",
+	         y = "Fréquence") +
+	    custom_theme
+	})
+	
+	output$etudeLangues_languesPlotTendance <- renderPlot({
+	  # Regroupés par année et langage de programmation, comptez le nombre d'entrepôts dans chaque langue par an
+	  language_count <- df_filtered[df_filtered$year <= input$etudeLangues_sliderSelection2[2] & df_filtered$year >= input$etudeLangues_sliderSelection2[1],] %>%
+	    group_by(year, primaryLanguage) %>%
+	    summarise(count = n()) %>%
+	    ungroup()
+	  
+	  # Calculer le nombre cumulé de chaque langue par an
+	  language_count <- language_count %>%
+	    group_by(primaryLanguage) %>%
+	    mutate(cumulative_count = cumsum(count)) %>%
+	    ungroup()
+	  
+	  # Filtrer les langues choisi
+	  selected_languages <- language_distribution[language_distribution$count >= input$etudeLangues_sliderSelection1[1] & language_distribution$count <= input$etudeLangues_sliderSelection1[2],]%>%
+	    pull(primaryLanguage)
+	  
+	  # Dessiner un graphique linéaire
+	  ggplot(language_count %>% filter(primaryLanguage %in% selected_languages), aes(x = year, y = cumulative_count, color = primaryLanguage)) +
+	    geom_line() +
+	    geom_text(data = language_count %>% filter(primaryLanguage %in% selected_languages) %>% group_by(primaryLanguage) %>% filter(year == max(year)), aes(label = primaryLanguage), vjust = -0.5, nudge_y = 1000, check_overlap = TRUE) +
+	    labs(x = "Year", y = "Nombre cumulé",title = paste(
+	      "Nombre cumulé annuel des langues entre ",
+	      input$etudeLangues_sliderSelection2[1], " et ",
+	      input$etudeLangues_sliderSelection2[2]) )
+	      
+	})
+	
 }
