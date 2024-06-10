@@ -8,8 +8,8 @@ const octokit = new Octokit({
 });
 
 function main() {
-  addContributorsCount(octokit, 'githubStar1-10/data_1.csv', 'data_1.csv', 0, 300);
-  addContributorsCount(octokit, 'githubStar1-10/data_2.csv', 'data_2.csv', 0, 300);
+  addContributorsCount(octokit, 'githubStar1-10/data_1.csv', 'data_3.csv', 301, 300);
+  addContributorsCount(octokit, 'githubStar1-10/data_2.csv', 'data_4.csv', 301, 300);
 }
 
 main();

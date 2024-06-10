@@ -3,7 +3,7 @@ import {openCSVFile, writeCSVFile} from "./utils/fs.js";
 export async function addContributorsCount(octokit, filename, exportFilename, start, count) {
   const raw = openCSVFile(`data/${filename}`);
 
-  const data = raw.slice(start, count);
+  const data = raw.slice(start, start + count);
 
   for (const item of data) {
     let page = 1;
@@ -39,7 +39,7 @@ export async function addContributorsCount(octokit, filename, exportFilename, st
     item.contributors = contribCount;
 
     console.log("Edit:", item.nameWithOwner, contribCount);
-  }
 
-  writeCSVFile(exportFilename, data)
+    writeCSVFile(exportFilename, data)
+  }
 }

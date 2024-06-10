@@ -2,7 +2,7 @@
 
 ## 4.1 Analyse des contributeurs
 
-Une autre mesure importante pour évaluer la vitalité d'un dépôt est le nombre de contributeurs. Plus un projet a de contributeurs, plus il est probable qu'il soit actif et qu'il bénéficie d'un développement continu. Nous utilisons un dataset de 600 lignes, augmenté en utilisant un script et l'API de GitHub. En réalité nous n'ajoutons que le nombre de contributeurs.
+Une autre mesure importante pour évaluer la vitalité d'un dépôt est le nombre de contributeurs. Plus un projet a de contributeurs, plus il est probable qu'il soit actif et qu'il bénéficie d'un développement continu. Nous utilisons un dataset de 1200 lignes, augmenté en utilisant un script et l'API de GitHub. En réalité nous n'ajoutons que le nombre de contributeurs. Cette limite est due aux contraintes d'utilisation de l'API GitHub, notamment le nombre de requêtes par seconde.
 
 ## 4.2 Relation entre le nombre de contributeurs et le nombre d'étoiles 
 
@@ -10,8 +10,10 @@ Une autre mesure importante pour évaluer la vitalité d'un dépôt est le nombr
 ```{r}
 d1 <- read_csv("../../data/githubContrib/data_1.csv")
 d2 <- read_csv("../../data/githubContrib/data_2.csv")
+d3 <- read_csv("../../data/githubContrib/data_3.csv")
+d4 <- read_csv("../../data/githubContrib/data_4.csv")
 
-df <- bind_rows(d1, d2) %>% filter(!is.na(contributors))
+df <- bind_rows(d1, d2, d3, d4) %>% filter(!is.na(contributors))
 
 ```
 
