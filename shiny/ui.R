@@ -46,6 +46,23 @@ ui <- dashboardPage(
 	
 	# body
 	dashboardBody(
+		
+		tags$head(
+			tags$style(type = "text/css", "
+			
+			#presentData_rechercheRepo_input {
+				white-space: pre-line;
+			}
+			
+			#presentData_rechercheRepo_nom {
+				width: 75%;
+			}
+			
+          "
+			)
+		),
+		
+		
 		tabItems(
 			
 			# Onglet Présentation des données
@@ -87,6 +104,7 @@ ui <- dashboardPage(
 									textOutput("presentData_rechercheRepo_input")
 								),
 								box(
+									class = 'infoBoxes',
 									infoBoxOutput("presentData_rechercheRepo_nom")
 								)
 							)

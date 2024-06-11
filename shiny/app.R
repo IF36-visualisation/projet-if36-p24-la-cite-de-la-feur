@@ -1,4 +1,4 @@
-# Ce premier ichier permet d'effectuer quelques prêt traitement des données.
+# Ce premier fichier permet d'effectuer quelques prêt traitement des données.	
 # Le fichier ui contient l'ensemble des éléments relatifs à l'ui
 # Le fichier server contient les fonctions de routine métier
 

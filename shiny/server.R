@@ -73,20 +73,33 @@ server <- function(input, output) {
 	})
 	
 	output$presentData_rechercheRepo_input <- renderText({
-		repoNameList <- df$name
-		pattern <- pattern <- paste(".*",input$presentData_rechercheRepoName, sep="")
+		repoNameList <- df$nameWithOwner
+		pattern <- input$presentData_rechercheRepoName
 		matchingList <- grep(pattern, repoNameList, value = TRUE)
 		paste(
-			paste(matchingList[1:min(100,length(matchingList))],collapse = " "),
+			paste(matchingList[1:min(50,length(matchingList))], collapse = "\n"),
 			"..."
 		)
 	})
+	
+	# output$presentData_rechercheRepo_input <- renderPrint({
+	# 	repoNameList <- df$name
+	# 	pattern <- pattern <- paste(".*",input$presentData_rechercheRepoName, sep="")
+	# 	matchingList <- grep(pattern, repoNameList, value = TRUE)
+	# 	writeLines(
+	# 		paste(matchingList[1:min(100,length(matchingList))],collapse = "\n")
+	# 	)
+	# })
+	
 	
 	# Nom du dépôt recherché
 	output$presentData_rechercheRepo_nom <- renderInfoBox({
 		infoBox(
 			"Dépôt ayant le plus d'étoiles",
-			df[df$name == input$rechercheRepoName,"name"],
+			df[
+				df$name == input$presentData_rechercheRepoName | df$nameWithOwner == input$presentData_rechercheRepoName,
+				"name"
+			],
 			icon = icon("house"),
 			color = 'purple',
 			fill = TRUE
