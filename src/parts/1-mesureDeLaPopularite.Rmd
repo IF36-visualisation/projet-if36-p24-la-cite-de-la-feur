@@ -3,6 +3,7 @@ output:
   pdf_document: default
   html_document: default
 ---
+
 # 2. Première étude : mesurer la popularité des dépôts
 
 ## 2.1 Notre interprétation du nombre d'étoile d'un dépôt sur GitHub
@@ -85,7 +86,7 @@ On peut afficher les données en découpant en 4 sous-jeu :
 
 grâce à notre DashBoard joint à ce rapport nous pouvons jouer sur les intervalles
 
-![Capture d'écran du dashboard](../img/dashboard_hist_etoiles.png)
+![Capture d'écran du dashboard](./src/img/dashboard_hist_etoiles.png)
 
 ```{r echo=FALSE}
 # les dépôts entre 97 et 1000 étoiles
@@ -581,14 +582,7 @@ grande majorité des points dans le coin infénieur gauche ("faibles" valeurs de
 
 Nous avons réalisé ce même graphique en utilisant Tableau :
 
-```html
-<figure>
-  <img src="../img/nuage1.png" alt="Capture d'écran de Tableau" />
-  <figcaption>Capture d'écran de Tableau</figcaption>
-</figure>
-```
-
-![Capture d'écran de Tableau](../img/nuage1.png)
+![Capture d'écran de Tableau](./src/img/nuage1.png)
 
 On peut commencer par tracer le même graphique en retirant tous les dépôts possédant
 moins de 10000 étoiles.
@@ -615,14 +609,7 @@ n'évolue que très peu quelque soit le nombre d'étoile attribué au dépôt.
 
 Nous avons réalisé ce même graphique en utilisant Tableau :
 
-```html
-<figure>
-  <img src="../img/nuage2.png" alt="Capture d'écran de Tableau" />
-  <figcaption>Capture d'écran de Tableau</figcaption>
-</figure>
-```
-
-![Capture d'écran de Tableau](../img/nuage2.png)
+![Capture d'écran de Tableau](./src/img/nuage2.png)
 
 On observe quelque dépôts qui sortent du lot (valeurs abérantes) qui possèdent 
 plus de `watchers` que de `stars` (ce qui va à l'encontre de la très large 
