@@ -1,0 +1,54 @@
+# Annexes - Répartition des contributions
+
+## Rapport
+
+Baptiste Toussaint :
+1. Introduction
+1.1 Description des données
+1.1.1 Présentation de GitHub
+1.1.2 Les métadonnées de l’API GitHub
+1.1.3 Présentation des données
+1.1.4 Pourquoi étudier ces données ?
+1.2 Plan d’analyse
+1.2.1 Objectifs de l’analyses
+1.2.2 Mesure de la popularité
+1.2.3 Mesure des contributions
+1.2.4 Étude des langages de programmation utilisés
+1.3 Préparation des données
+1.3.1 Charger le jeu de données
+1.3.2 Triater les doublons
+2. Première étude : mesurer la popularité des dépôts
+2.1 Notre interprétation du nombre d’étoile d’un dépôt sur GitHub
+2.2 Comment se répartissent le nombre d’étoile sur la plateforme ?
+2.3 La date création d’un dépot influence-t-elle sa popularité ?
+2.4 Existe-il un lien entre le nombre d’étoile et le nombre de de watchers ?
+2.5 Existe-il un relation entre le nombre d’étoile et le nombre de de forks ?
+3.2.2 Alternative : représentation avec un nuage de mots
+
+
+Shilun XU :
+3. Deuxième étude :Étude des langages de programmation utilisés: language
+3.1 Notre interprétation du langages de programmation
+3.2 Popularité du langage de programmation
+3.2.1 Analyse par un histogramme
+3.2.3 Nuage de points pour comparer la popularité des langages
+3.3 Tendances dans les langages de programmation grand public
+3.4 Analyse des langages de programmation et des métriques des dépôts
+3.4.1 Comparaison de l’utilisation du disque par langage de programmation
+3.4.2 Analyse des pull requests et des issues par langage de programmation
+
+Louis Duhal Berruer:
+4. Troisième étude : Étude des contributeurs
+4.1 Analyse des contributeurs
+4.2 Relation entre le nombre de contributeurs et le nombre d’étoiles
+4.3 Distribution du nombre de contributeurs des dépôts
+4.4 Nombre moyen de contributeurs par catégorie d’étoiles
+
+## Dashboard R Shiny
+
+Shilun XU: onglet "Répartition des langues"
+Baptiste Toussaint: le reste
+
+## Dashboard Tableau
+
+Shilun XU

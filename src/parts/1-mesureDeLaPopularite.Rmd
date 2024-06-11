@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # 2. Première étude : mesurer la popularité des dépôts
 
 ## 2.1 Notre interprétation du nombre d'étoile d'un dépôt sur GitHub
@@ -576,6 +581,13 @@ grande majorité des points dans le coin infénieur gauche ("faibles" valeurs de
 
 Nous avons réalisé ce même graphique en utilisant Tableau :
 
+```html
+<figure>
+  <img src="../img/nuage1.png" alt="Capture d'écran de Tableau" />
+  <figcaption>Capture d'écran de Tableau</figcaption>
+</figure>
+```
+
 ![Capture d'écran de Tableau](../img/nuage1.png)
 
 On peut commencer par tracer le même graphique en retirant tous les dépôts possédant
@@ -602,6 +614,13 @@ Contrairement à notre hypothèse de base, il semble que le nombre de `watchers`
 n'évolue que très peu quelque soit le nombre d'étoile attribué au dépôt.
 
 Nous avons réalisé ce même graphique en utilisant Tableau :
+
+```html
+<figure>
+  <img src="../img/nuage2.png" alt="Capture d'écran de Tableau" />
+  <figcaption>Capture d'écran de Tableau</figcaption>
+</figure>
+```
 
 ![Capture d'écran de Tableau](../img/nuage2.png)
 

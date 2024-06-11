@@ -3,8 +3,8 @@ title: "Projet IF36"
 author: "Baptiste Toussaint"
 date: "`r Sys.Date()`"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 urlcolor: blue
 ---
 
@@ -40,8 +40,11 @@ Langue : Français
 ```{r child="./src/parts/1-mesureDeLaPopularite.Rmd"}
 ```
 
-```{r child="./src/parts/2-etudeDesLangues.Rmd.Rmd"}
+```{r child="./src/parts/2-etudeDesLangues.Rmd"}
 ```
 
-```{r child="./src/parts/2-etudeDesContributeurs.Rmd"}
+```{r child="./src/parts/3-etudeDesContributeurs.Rmd"}
+```
+
+```{r child="./src/parts/annexes.Rmd"}
 ```
