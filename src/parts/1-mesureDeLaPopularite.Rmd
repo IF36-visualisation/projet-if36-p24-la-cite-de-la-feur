@@ -574,6 +574,10 @@ dans les valeurs de `stars` qui vient "tasser" la très
 grande majorité des points dans le coin infénieur gauche ("faibles" valeurs de
 `stars` et faibles valeurs de `watchers`)
 
+Nous avons réalisé ce même graphique en utilisant Tableau :
+
+![Capture d'écran de Tableau](../img/nuage1.png)
+
 On peut commencer par tracer le même graphique en retirant tous les dépôts possédant
 moins de 10000 étoiles.
 
@@ -596,6 +600,10 @@ ggplot() +
 
 Contrairement à notre hypothèse de base, il semble que le nombre de `watchers`
 n'évolue que très peu quelque soit le nombre d'étoile attribué au dépôt.
+
+Nous avons réalisé ce même graphique en utilisant Tableau :
+
+![Capture d'écran de Tableau](../img/nuage2.png)
 
 On observe quelque dépôts qui sortent du lot (valeurs abérantes) qui possèdent 
 plus de `watchers` que de `stars` (ce qui va à l'encontre de la très large 
