@@ -213,8 +213,7 @@ Après avoir vu les résultats ci-dessus, nous ne pouvons nous empêcher de nous
 quand Python et JavaScript sont-ils devenus si populaires? Nous devons découvrir les 
 tendances de ces langages de programmation.
 
-Mais avant cela, nous devons traiter spécialement notre ensemble de données：
-
+Mais avant cela, nous devons traiter spécialement notre ensemble de données :
 
 ```{r}
 

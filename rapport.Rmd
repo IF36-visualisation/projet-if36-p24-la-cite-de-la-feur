@@ -3,8 +3,8 @@ title: "Projet IF36"
 author: "Baptiste Toussaint"
 date: "`r Sys.Date()`"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 urlcolor: blue
 ---
 
@@ -45,6 +45,19 @@ Langue : Français
 
 ```{r child="./src/parts/3-etudeDesContributeurs.Rmd"}
 ```
+
+# Conclusion
+
+En conclusion, nous avons donc mené une analyse du comportement des utilisateurs
+sur la plateforme GitHub sur la base des données présentes dans notre jeu de données.
+
+Dans un premier temps, nous avons cherché à comprendre comment décrire la popularité des dépôts grâce aux métriques : nombre de `stars`, nombre de `watchers`, nombre de `forks`.
+
+Nous avons ensuite cherché à savoir quels langages de programmation sont les plus
+utilisés et donc populaires sur la plateforme.
+
+Enfin, à l'aide d'un script, nous avons augmenté notre je donnée pour obtenir le
+nombre de contributeur sur les dépôts pour étudier cette métrique supplémentaire.
 
 ```{r child="./src/parts/annexes.Rmd"}
 ```
